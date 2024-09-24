@@ -1,19 +1,26 @@
-import { FormInputProps } from "../Types/types";
+import { FormInputProps } from "../Types/Types";
 
-const FormInput = ({ label, name, type, defaultValue }: FormInputProps) => {
+const FormInput = ({
+  label,
+  name,
+  type,
+  defaultValue = "",
+  handleInputChange,
+}: FormInputProps) => {
   return (
-    <label className="form-control">
+    <div className="form-control">
       <div className="label">
-        <span className="label-text capitalize font-semibold">{label}</span>
+        <span className="label-text capitalize">{label}</span>
       </div>
       <input
         type={type}
         name={name}
         placeholder="Type here"
-        className="input input-bordered w-full rounded-md focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+        className="input input-bordered"
         defaultValue={defaultValue}
+        onChange={(e) => handleInputChange(e.target.value)}
       />
-    </label>
+    </div>
   );
 };
 export default FormInput;

@@ -2,5 +2,6 @@ export interface FormInputProps {
   label: string;
   name: string;
   type: string;
-  defaultValue: string | number;
+  handleInputChange: (value: string) => void;
+  defaultValue?: string | number;
 }
