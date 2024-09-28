@@ -1,5 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Login, Register } from "./Pages";
+import { Admin, Login, Register, User } from "./Pages";
 import { Error } from "./Pages";
 
 const router = createBrowserRouter([
@@ -11,6 +11,16 @@ const router = createBrowserRouter([
   {
     path: "register",
     element: <Register />,
+    errorElement: <Error />,
+  },
+  {
+    path: "user/:id",
+    element: <User />,
+    errorElement: <Error />,
+  },
+  {
+    path: "admin",
+    element: <Admin />,
     errorElement: <Error />,
   },
 ]);
