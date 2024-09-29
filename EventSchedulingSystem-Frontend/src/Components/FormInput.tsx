@@ -4,9 +4,17 @@ const FormInput = ({
   label,
   name,
   type,
-  defaultValue = "",
+  value,
   handleInputChange,
 }: FormInputProps) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (type === "checkbox") {
+      handleInputChange(e.target.checked);
+    } else {
+      handleInputChange(e.target.value);
+    }
+  };
+
   return (
     <div className="form-control">
       <div className="label">
@@ -15,10 +23,15 @@ const FormInput = ({
       <input
         type={type}
         name={name}
-        placeholder="Type here"
-        className="input input-bordered"
-        defaultValue={defaultValue}
-        onChange={(e) => handleInputChange(e.target.value)}
+        placeholder={type !== "checkbox" ? "Enter text here..." : undefined}
+        className={
+          type !== "checkbox"
+            ? "input input-bordered"
+            : "checkbox border-orange-400 [--chkbg:theme(colors.indigo.600)] [--chkfg:orange] checked:border-indigo-800 ml-1"
+        }
+        checked={type === "checkbox" ? (value as boolean) : undefined}
+        value={type !== "checkbox" ? (value as string) : undefined}
+        onChange={handleChange}
       />
     </div>
   );

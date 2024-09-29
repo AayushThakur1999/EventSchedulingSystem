@@ -1,10 +1,20 @@
-export interface FormInputProps {
+export interface FormInputTextProps {
   label: string;
   name: string;
-  type: string;
-  handleInputChange: (value: string) => void;
-  defaultValue?: string | number;
+  type: "text";
+  handleInputChange: React.Dispatch<React.SetStateAction<string>>;
+  value: string;
 }
+
+export interface FormInputCheckboxProps {
+  label: string;
+  name: string;
+  type: "checkbox";
+  handleInputChange: React.Dispatch<React.SetStateAction<boolean>>;
+  value: boolean;
+}
+
+export type FormInputProps = FormInputTextProps | FormInputCheckboxProps;
 
 export interface AvailabilityProps {
   id: string;

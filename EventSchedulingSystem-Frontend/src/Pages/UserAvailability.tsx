@@ -7,7 +7,7 @@ import { AvailabilityProps } from "../Types/Types";
 import { nanoid } from "nanoid";
 import { Link } from "react-router-dom";
 
-const User = () => {
+const UserAvailability = () => {
   const [availability, setAvailability] = useState<AvailabilityProps>({
     id: nanoid(),
     startDateAndTime: new Date(),
@@ -22,11 +22,13 @@ const User = () => {
   );
 
   const updateAvailability = () => {
-    setAvailabilityList(availabilityList => [...availabilityList, availability]);
+    setAvailabilityList((availabilityList) => [
+      ...availabilityList,
+      availability,
+    ]);
     console.log("updateAvailability RAN!");
-    
+
     console.log(availabilityList);
-    
   };
 
   const deleteAvailability = (id: string) => {
@@ -58,7 +60,9 @@ const User = () => {
 
   return (
     <section className="max-w-4xl mx-auto my-8 p-8 bg-base-200 shadow-xl rounded-xl">
-      <h2 className="text-center text-4xl font-bold mb-6 text-primary">Set Availability</h2>
+      <h2 className="text-center text-4xl font-bold mb-6 text-primary">
+        Set Availability
+      </h2>
       <div className="flex justify-end mb-6">
         <Link to="/sessions" className="btn btn-outline btn-primary">
           Upcoming Sessions
@@ -102,7 +106,10 @@ const User = () => {
           <h4 className="text-2xl font-semibold mb-4">Your Availability</h4>
           <ul className="space-y-4">
             {availabilityList.map((item) => (
-              <li key={nanoid()} className="flex items-center justify-between bg-base-100 p-4 rounded-lg shadow">
+              <li
+                key={nanoid()}
+                className="flex items-center justify-between bg-base-100 p-4 rounded-lg shadow"
+              >
                 <span className="text-sm md:text-base">
                   {`${item.startDateAndTime.toLocaleString()} - ${item.endDateAndTime.toLocaleString()}`}
                 </span>
@@ -121,4 +128,4 @@ const User = () => {
   );
 };
 
-export default User;
+export default UserAvailability;
