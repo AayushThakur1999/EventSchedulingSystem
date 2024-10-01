@@ -15,6 +15,24 @@ const FormInput = ({
     }
   };
 
+  const getAutocomplete = () => {
+    if (type === "password") {
+      return name === "newPassword" ? "new-password" : "current-password";
+    }
+    if (type === "email") {
+      return "email"; // Use "email" for email fields
+    }
+    if (type === "text") {
+      if (name === "fullname") {
+        return "name"; // "name" for fullname
+      }
+      if (name === "username") {
+        return "username"; // "username" for username
+      }
+    }
+    return undefined; // No autocomplete for other input types by default
+  };
+
   return (
     <div className="form-control">
       <div className="label">
@@ -23,7 +41,7 @@ const FormInput = ({
       <input
         type={type}
         name={name}
-        placeholder={type !== "checkbox" ? "Enter text here..." : undefined}
+        placeholder={type !== "checkbox" ? `Enter ${label} here...` : undefined}
         className={
           type !== "checkbox"
             ? "input input-bordered"
@@ -32,6 +50,7 @@ const FormInput = ({
         checked={type === "checkbox" ? (value as boolean) : undefined}
         value={type !== "checkbox" ? (value as string) : undefined}
         onChange={handleChange}
+        autoComplete={getAutocomplete()}
       />
     </div>
   );

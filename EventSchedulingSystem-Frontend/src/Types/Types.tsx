@@ -1,7 +1,7 @@
 export interface FormInputTextProps {
   label: string;
   name: string;
-  type: "text";
+  type: "text" | "email" | "password";
   handleInputChange: React.Dispatch<React.SetStateAction<string>>;
   value: string;
 }
