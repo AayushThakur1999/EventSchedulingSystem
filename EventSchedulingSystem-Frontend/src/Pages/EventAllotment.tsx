@@ -194,9 +194,11 @@ const EventAllotment = () => {
     // send this data to DB
     const userSchedulingData = {
       username: username,
-      [selectedDate]: {
-        meetingStartTime,
-        meetingEndTime,
+      schedule: {
+        [selectedDate]: {
+          meetingStartTime,
+          meetingEndTime,
+        },
       },
       eventName,
       multipleAttendees,

@@ -1,14 +1,24 @@
-import { Form, Link } from "react-router-dom";
+import { Form, Link, useNavigate } from "react-router-dom";
 import { FormInput, SubmitBtn } from "../Components";
 import { useState } from "react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  const handleSubmit = () => {
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     console.log("Email:", email);
     console.log("Password:", password);
+    console.log("Are you an admin:", isAdmin);
+    if (isAdmin) {
+      navigate("/admin");
+    } else {
+      navigate("/user/1");
+    }
   };
 
   return (
@@ -23,15 +33,22 @@ const Login = () => {
           type="email"
           label="email"
           name="userEmail"
-          defaultValue="test@test.com"
+          value={email}
           handleInputChange={setEmail}
         />
         <FormInput
           type="password"
           label="password"
           name="userPassword"
-          defaultValue="secret"
+          value={password}
           handleInputChange={setPassword}
+        />
+        <FormInput
+          type="checkbox"
+          label="Are you an admin?"
+          name="admin"
+          value={isAdmin}
+          handleInputChange={setIsAdmin}
         />
         <div className="mt-4">
           <SubmitBtn text="login" />
@@ -46,4 +63,5 @@ const Login = () => {
     </section>
   );
 };
+
 export default Login;
