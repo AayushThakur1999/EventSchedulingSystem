@@ -51,6 +51,7 @@ const FormInput = ({
         value={type !== "checkbox" ? (value as string) : undefined}
         onChange={handleChange}
         autoComplete={getAutocomplete()}
+        required={type === "checkbox" ? false : true}
       />
     </div>
   );

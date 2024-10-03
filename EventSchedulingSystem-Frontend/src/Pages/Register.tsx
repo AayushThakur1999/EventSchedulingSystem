@@ -2,6 +2,7 @@ import { Form, Link, useNavigate } from "react-router-dom";
 import { FormInput, SubmitBtn } from "../Components";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 const Register = () => {
   const [username, setUsername] = useState("");
@@ -11,7 +12,7 @@ const Register = () => {
 
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!fullname || !password || !fullname || !email) {
       alert("Fill all form fields");
@@ -23,15 +24,27 @@ const Register = () => {
       email,
       password,
     };
-    console.log(registerData);
-    toast.success("Registered Successfully!");
-    navigate("/login");
+    // console.log(registerData);
+    // toast.success("Registered Successfully!");
+    try {
+      const response = await axios.post("/users/register", registerData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log("Success Response:", response);
+      toast("Successfully registered!! ");
+      navigate("/login");
+    } catch (error) {
+      console.error("ERROR:--", error);
+    }
   };
 
   return (
     <section className="h-screen grid place-items-center">
       <Form
         method="POST"
+        action="/users/register"
         className="card w-96 p-8 bg-base-100 shadow-lg flex flex-col gap-y-4"
         onSubmit={handleSubmit}
       >
