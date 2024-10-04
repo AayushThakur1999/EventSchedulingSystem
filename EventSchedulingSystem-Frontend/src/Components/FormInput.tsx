@@ -1,19 +1,7 @@
 import { FormInputProps } from "../Types/Types";
 
-const FormInput = ({
-  label,
-  name,
-  type,
-  value,
-  handleInputChange,
-}: FormInputProps) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (type === "checkbox") {
-      handleInputChange(e.target.checked);
-    } else {
-      handleInputChange(e.target.value);
-    }
-  };
+const FormInput = ({ label, name, type, defaultValue }: FormInputProps) => {
+  const isCheckbox = type === "checkbox";
 
   const getAutocomplete = () => {
     if (type === "password") {
@@ -41,17 +29,16 @@ const FormInput = ({
       <input
         type={type}
         name={name}
-        placeholder={type !== "checkbox" ? `Enter ${label} here...` : undefined}
+        placeholder={isCheckbox ? undefined : `Enter ${label} here...`}
         className={
-          type !== "checkbox"
-            ? "input input-bordered"
-            : "checkbox border-orange-400 [--chkbg:theme(colors.indigo.600)] [--chkfg:orange] checked:border-indigo-800 ml-1"
+          isCheckbox
+            ? "checkbox border-orange-400 [--chkbg:theme(colors.indigo.600)] [--chkfg:orange] checked:border-indigo-800 ml-1"
+            : "input input-bordered"
         }
-        checked={type === "checkbox" ? (value as boolean) : undefined}
-        value={type !== "checkbox" ? (value as string) : undefined}
-        onChange={handleChange}
-        autoComplete={getAutocomplete()}
-        required={type === "checkbox" ? false : true}
+        defaultChecked={isCheckbox ? Boolean(defaultValue) : undefined}
+        defaultValue={!isCheckbox ? (defaultValue as string) : undefined}
+        autoComplete={isCheckbox ? undefined : getAutocomplete()}
+        required={!isCheckbox}
       />
     </div>
   );

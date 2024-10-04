@@ -7,16 +7,20 @@ import {
   UserAvailability,
 } from "./Pages";
 import { Error } from "./Pages";
+import { action as registerAction } from "./Pages/Register";
+import { action as loginAction } from "./Pages/Login";
 
 const router = createBrowserRouter([
   {
     path: "login",
     element: <Login />,
+    action: loginAction,
     errorElement: <Error />,
   },
   {
     path: "register",
     element: <Register />,
+    action: registerAction,
     errorElement: <Error />,
   },
   {
