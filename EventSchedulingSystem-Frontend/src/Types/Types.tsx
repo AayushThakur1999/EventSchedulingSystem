@@ -1,8 +1,9 @@
-export type FormInputProps = {
+export interface FormInputProps<T extends string | boolean> {
   label: string;
   name: string;
   type: "text" | "email" | "password" | "checkbox";
-  defaultValue?: string | boolean;
+  value?: T;
+  handleInputChange?: (value: T) => void;
 }
 
 export interface AvailabilityProps {

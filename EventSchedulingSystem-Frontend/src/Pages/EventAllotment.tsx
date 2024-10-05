@@ -310,7 +310,7 @@ const EventAllotment = () => {
           <h1 className="text-2xl font-bold mb-4">Meeting Type</h1>
           <FormInput
             label="Multiple Attendees?"
-            name="eventName"
+            name="multipleAttendees"
             type="checkbox"
             handleInputChange={setMultipleAttendees}
             value={multipleAttendees}
