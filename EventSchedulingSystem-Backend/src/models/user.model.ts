@@ -7,7 +7,6 @@ const userSchema = new Schema(
     fullname: {
       type: String,
       required: true,
-      lowercase: true,
       trim: true,
       index: true,
     },
@@ -34,10 +33,14 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    refreshToken: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
 
+// encrypts the password just before saving/changing it
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
     this.password = await bcrypt.hash(this.password, 10);
