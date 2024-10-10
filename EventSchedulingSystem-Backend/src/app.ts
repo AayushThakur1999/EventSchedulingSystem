@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 
 app.use(express.static("public"));
 
-// Used to perform CRUD operations on cookies present on the user's browser
+// Used to get access to cookies and perform CRUD operations on cookies present on the user's browser
 app.use(cookieParser());
 
 // routes import

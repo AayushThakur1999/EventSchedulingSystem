@@ -1,7 +1,10 @@
 import { User } from "../models/user.model";
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponse";
-import AsyncHandler from "../utils/AsyncHandler";
+import {
+  ApiError,
+  AsyncHandler,
+  generateAccessAndRefreshTokens,
+  ApiResponse,
+} from "../utils";
 
 export const registerUser = AsyncHandler(async (req, res) => {
   // Step 1 Get data fields from user
@@ -54,4 +57,69 @@ export const registerUser = AsyncHandler(async (req, res) => {
   return res
     .status(201)
     .json(new ApiResponse(200, createdUser, "User created successfully!"));
+});
+
+export const loginUser = AsyncHandler(async (req, res) => {
+  // Take input fields from user
+  // Check if any field is empty
+  // Find the user in the DB, if not found throw error
+  // Check the case when user is admin
+  // Compare the password to that in DB
+  // If the details are correct create access and refresh tokens else throw an error
+  // send cookies and response
+
+  const { username, email, password, isAdmin } = req.body;
+
+  if (!(username || email) || !password) {
+    throw new ApiError(
+      400,
+      "Both username or email and password are required."
+    );
+  }
+
+  const user = await User.findOne({
+    $or: [{ username }, { email }],
+  });
+
+  if (!user) {
+    throw new ApiError(400, "User does not exist :(");
+  }
+
+  if (isAdmin !== user.isAdmin && isAdmin === false) {
+    throw new ApiError(404, "No such user exists!");
+  }
+  if (isAdmin !== user.isAdmin && isAdmin === true) {
+    throw new ApiError(404, "No such admin exists!");
+  }
+
+  const isPasswordValid = await user.isPasswordCorrect(password);
+
+  if (!isPasswordValid) {
+    throw new ApiError(401, "Invalid user credentials!");
+  }
+
+  const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
+    user._id
+  );
+
+  const loggedInUser = await User.findById(user._id).select(
+    "-password -refreshToken"
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponse(
+        200,
+        { user: loggedInUser, accessToken, refreshToken },
+        "User logged-in successfully!"
+      )
+    );
 });

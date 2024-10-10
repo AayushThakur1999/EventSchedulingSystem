@@ -1,5 +1,8 @@
 import { Form, Link, redirect } from "react-router-dom";
 import { FormInput, SubmitBtn } from "../Components";
+import { useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 export const action = async ({ request }: { request: Request }) => {
   const formData = await request.formData();
@@ -8,14 +11,26 @@ export const action = async ({ request }: { request: Request }) => {
   const isAdmin = formData.has("isAdmin");
   const loginData = { ...data, isAdmin };
   console.log(loginData);
-  if (loginData.isAdmin) {
-    return redirect("/admin");
-  } else {
-    return redirect("/user/1");
+  try {
+    const response = await axios.post("/users/login", loginData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    console.log("response", response);
+    toast("You have logged-in successfully :)");
+    if (response.data.data.user.isAdmin) {
+      return redirect("/admin");
+    } else {
+      return redirect("/user/1");
+    }
+  } catch (error) {
+    console.error("Error::", error);
   }
 };
 
 const Login = () => {
+  const [usernameLogin, setUsernameLogin] = useState(false);
   return (
     <section className="h-screen grid place-items-center">
       <Form
@@ -23,7 +38,25 @@ const Login = () => {
         className="card w-96 p-8 bg-base-100 shadow-lg flex flex-col gap-y-4"
       >
         <h4 className="text-center text-3xl font-bold">Login</h4>
-        <FormInput type="email" label="email" name="emal" />
+        <div className="flex flex-col align-middle">
+          {usernameLogin ? (
+            <p className="text-center">Do you want to login using email?</p>
+          ) : (
+            <p className="text-center">Do you want to login using username?</p>
+          )}
+          <button
+            type="button"
+            className="mx-auto text-center text-base text-primary"
+            onClick={() => setUsernameLogin((userLogin) => !userLogin)}
+          >
+            Click here
+          </button>
+        </div>
+        {usernameLogin ? (
+          <FormInput type="text" label="username" name="username" />
+        ) : (
+          <FormInput type="email" label="email" name="email" />
+        )}
         <FormInput type="password" label="password" name="password" />
         <FormInput type="checkbox" label="Are you an admin?" name="isAdmin" />
         <div className="mt-4">

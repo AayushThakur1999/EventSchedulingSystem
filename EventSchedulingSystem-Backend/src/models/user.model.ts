@@ -1,8 +1,9 @@
 import { Schema, model } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { IUser, IUserMethods, UserModel } from "../types";
 
-const userSchema = new Schema(
+const userSchema = new Schema<IUser, UserModel, IUserMethods>(
   {
     fullname: {
       type: String,
@@ -48,11 +49,13 @@ userSchema.pre("save", async function (next) {
   next();
 });
 
-userSchema.methods.isPasswordCorrect = async function (password: string) {
+userSchema.methods.isPasswordCorrect = async function (
+  password: string
+): Promise<boolean> {
   return await bcrypt.compare(password, this.password);
 };
 
-userSchema.methods.generateAccessToken = function () {
+userSchema.methods.generateAccessToken = function (): string {
   return jwt.sign(
     {
       _id: this._id,
@@ -67,7 +70,7 @@ userSchema.methods.generateAccessToken = function () {
   );
 };
 
-userSchema.methods.generateRefreshToken = function () {
+userSchema.methods.generateRefreshToken = function (): string {
   return jwt.sign(
     {
       _id: this._id,
@@ -79,4 +82,4 @@ userSchema.methods.generateRefreshToken = function () {
   );
 };
 
-export const User = model("User", userSchema);
+export const User = model<IUser, UserModel>("User", userSchema);
