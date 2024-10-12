@@ -4,7 +4,7 @@ import { ApiError } from "./ApiError";
 
 export const generateAccessAndRefreshTokens = async (
   userId: Types.ObjectId | string
-) => {
+): Promise<{ accessToken: string; refreshToken: string }> => {
   try {
     const user = await User.findById(userId);
     if (!user) {

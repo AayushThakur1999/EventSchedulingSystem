@@ -5,7 +5,9 @@ import "react-datepicker/dist/react-datepicker.css";
 
 import { AvailabilityProps } from "../Types/Types";
 import { nanoid } from "nanoid";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const UserAvailability = () => {
   const [availability, setAvailability] = useState<AvailabilityProps>({
@@ -20,6 +22,8 @@ const UserAvailability = () => {
   const [availabilityList, setAvailabilityList] = useState<AvailabilityProps[]>(
     []
   );
+
+  const navigate = useNavigate();
 
   const updateAvailability = () => {
     setAvailabilityList((availabilityList) => [
@@ -58,15 +62,33 @@ const UserAvailability = () => {
     });
   };
 
+  const logoutUser = async () => {
+    try {
+      const response = await axios.post("/users/logout", {});
+      console.log(response);
+      toast(response.data?.message || "You have Logged-Out Successfully :)");
+      navigate("/login");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <section className="max-w-4xl mx-auto my-8 p-8 bg-base-200 shadow-xl rounded-xl">
       <h2 className="text-center text-4xl font-bold mb-6 text-primary">
         Set Availability
       </h2>
-      <div className="flex justify-end mb-6">
+      <div className="flex justify-between mb-6">
         <Link to="/sessions" className="btn btn-outline btn-primary">
           Upcoming Sessions
         </Link>
+        <button
+          type="button"
+          className="btn btn-outline btn-error"
+          onClick={logoutUser}
+        >
+          Logout
+        </button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="form-control">

@@ -18,7 +18,7 @@ export const action = async ({ request }: { request: Request }) => {
       },
     });
     console.log("response", response);
-    toast("You have logged-in successfully :)");
+    toast(response.data?.message || "You have logged-in successfully :)");
     if (response.data.data.user.isAdmin) {
       return redirect("/admin");
     } else {
@@ -26,11 +26,15 @@ export const action = async ({ request }: { request: Request }) => {
     }
   } catch (error) {
     console.error("Error::", error);
+    if (error instanceof Error) {
+      throw new Error(error.message)
+    }
   }
 };
 
 const Login = () => {
   const [usernameLogin, setUsernameLogin] = useState(false);
+  
   return (
     <section className="h-screen grid place-items-center">
       <Form
