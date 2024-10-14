@@ -36,9 +36,9 @@ export interface UserModel extends Model<UserDocument> {
 }
 
 // used as type for decoded Jwt token based on generateAccessToken method in userSchema
-export interface CustomJwtPayload extends JwtPayload {
+export interface TokensJwtPayload extends JwtPayload {
   _id: string;
-  email: string;
-  username: string;
-  fullname: string;
+  email?: string;
+  username?: string;
+  fullname?: string;
 }

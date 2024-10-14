@@ -1,10 +1,13 @@
+import { cookieOptions } from "../constants";
 import { User } from "../models/user.model";
+import { TokensJwtPayload } from "../types";
 import {
   ApiError,
   AsyncHandler,
   generateAccessAndRefreshTokens,
   ApiResponse,
 } from "../utils";
+import jwt from "jsonwebtoken";
 
 export const registerUser = AsyncHandler(async (req, res) => {
   // Step 1 Get data fields from user
@@ -106,15 +109,10 @@ export const loginUser = AsyncHandler(async (req, res) => {
     "-password -refreshToken"
   );
 
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
-
   return res
     .status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
+    .cookie("accessToken", accessToken, cookieOptions)
+    .cookie("refreshToken", refreshToken, cookieOptions)
     .json(
       new ApiResponse(
         200,
@@ -135,14 +133,51 @@ export const logoutUser = AsyncHandler(async (req, res) => {
     { new: true }
   );
 
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
+  return res
+    .status(200)
+    .clearCookie("accessToken", cookieOptions)
+    .clearCookie("refreshToken", cookieOptions)
+    .json(new ApiResponse(200, {}, "User logged-out successfully!"));
+});
+
+export const refreshAccessToken = AsyncHandler(async (req, res) => {
+  const incomingRefreshToken =
+    req.cookies.refreshToken || req.body.refreshToken;
+
+  if (!incomingRefreshToken) {
+    throw new ApiError(401, "unauthorized request :[");
+  }
+
+  const secret = process.env.REFRESH_TOKEN_SECRET;
+  if (!secret) {
+    throw new ApiError(
+      500,
+      "ACCESS_TOKEN_SECRET is not defined in environment variables"
+    );
+  }
+  const decodedToken = (await jwt.verify(
+    incomingRefreshToken,
+    secret
+  )) as TokensJwtPayload;
+
+  const user = await User.findById(decodedToken?._id);
+
+  if (!user) {
+    throw new ApiError(401, "Invalid refresh token :<");
+  }
+
+  const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
+    await generateAccessAndRefreshTokens(user?._id);
 
   return res
     .status(200)
-    .clearCookie("accessToken", options)
-    .clearCookie("refreshToken", options)
-    .json(new ApiResponse(200, {}, "User logged-out successfully!"));
+    .cookie("accessToken", newAccessToken, cookieOptions)
+    .cookie("refreshToken", newRefreshToken, cookieOptions)
+    .json(
+      new ApiResponse(
+        200,
+        { accessToken: newAccessToken, refreshToken: newRefreshToken },
+        "access token refreshed :>"
+      )
+    );
 });

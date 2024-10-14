@@ -1,5 +1,5 @@
 import { User } from "../models/user.model";
-import { CustomJwtPayload } from "../types";
+import { TokensJwtPayload } from "../types";
 import { ApiError, AsyncHandler } from "../utils";
 import jwt from "jsonwebtoken";
 
@@ -21,12 +21,12 @@ export const verifyJWT = AsyncHandler(async (req, _, next) => {
         "ACCESS_TOKEN_SECRET is not defined in environment variables"
       );
     }
-    const decodedToken = jwt.verify(token, secret) as CustomJwtPayload;
+    const decodedToken = jwt.verify(token, secret) as TokensJwtPayload;
 
     const user = await User.findById(decodedToken?._id).select(
       "-password -refreshToken"
     );
-    
+
     if (!user) {
       throw new ApiError(401, "Invalid access token");
     }
