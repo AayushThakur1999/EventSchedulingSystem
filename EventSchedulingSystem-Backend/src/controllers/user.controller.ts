@@ -141,6 +141,15 @@ export const logoutUser = AsyncHandler(async (req, res) => {
 });
 
 export const refreshAccessToken = AsyncHandler(async (req, res) => {
+  // try to get the refreshToken from cookies
+  // check if we got a refreshToken in cookies or not
+  // decode the refreshToken
+  // use the _id property inside decodedToken payload to fetch user
+  // check if user was found or the token was invalid/expired
+  // check if the refreshToken in user and that in cookies is same or not
+  // generate new access and refresh tokens
+  // return response with new access and refresh tokens inside cookies
+
   const incomingRefreshToken =
     req.cookies.refreshToken || req.body.refreshToken;
 
@@ -166,6 +175,10 @@ export const refreshAccessToken = AsyncHandler(async (req, res) => {
     throw new ApiError(401, "Invalid refresh token :<");
   }
 
+  if (incomingRefreshToken !== user.refreshToken) {
+    throw new ApiError(401, "Refresh token is expire");
+  }
+
   const { accessToken: newAccessToken, refreshToken: newRefreshToken } =
     await generateAccessAndRefreshTokens(user?._id);
 
@@ -181,3 +194,44 @@ export const refreshAccessToken = AsyncHandler(async (req, res) => {
       )
     );
 });
+
+export const changeCurrentPassword = AsyncHandler(async (req, res) => {
+  // get current and new password from user
+  // check if both passwords have been sent
+  // fetch user using _id in user object in req which we got through verifyJWT middleware
+  // check if the old password is correct using method in userSchema
+  /* save the new password at the place of the old one using the user object in req 
+     which we got through verifyJWT middleware */
+  // return success response
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword) {
+    // Alternative: !(currentPassword && newPassword)
+    throw new ApiError(401, "Unauthorized to perform this action");
+  }
+
+  const user = await User.findById(req.user?._id);
+  if (!user) {
+    throw new ApiError(500, "Something happened while fetching user");
+  }
+
+  const isPasswordCorrect = await user.isPasswordCorrect(currentPassword);
+  if (!isPasswordCorrect) {
+    throw new ApiError(400, "The current password provided is invalid");
+  }
+
+  user.password = newPassword;
+  await user.save({ validateBeforeSave: false });
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Password changed successfully!"));
+});
+
+export const getCurrentUser = AsyncHandler(async (req, res) => {
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, req.user, "current user data fetched successfully!")
+    );
+});
+
