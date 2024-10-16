@@ -201,7 +201,7 @@ export const changeCurrentPassword = AsyncHandler(async (req, res) => {
   // fetch user using _id in user object in req which we got through verifyJWT middleware
   // check if the old password is correct using method in userSchema
   /* save the new password at the place of the old one using the user object in req 
-     which we got through verifyJWT middleware */
+  which we got through verifyJWT middleware */
   // return success response
   const { currentPassword, newPassword } = req.body;
   if (!currentPassword || !newPassword) {
@@ -235,3 +235,29 @@ export const getCurrentUser = AsyncHandler(async (req, res) => {
     );
 });
 
+export const updateAccountDetails = AsyncHandler(async (req, res) => {
+  // get username and email from user
+  // check if atleast both username and email are provided
+  /* update them in DB user using the req.user._id which 
+  was made available by verifyJWT middleware */
+  // return response
+  const { fullname, email } = req.body;
+  if (!fullname || !email) {
+    throw new ApiError(400, "Both username and email are required!");
+  }
+
+  const user = await User.findByIdAndUpdate(
+    req.user?._id,
+    {
+      $set: {
+        fullname,
+        email,
+      },
+    },
+    { new: true }
+  ).select("-password -refreshToken");
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, user, "Account details updated successfully!"));
+});
