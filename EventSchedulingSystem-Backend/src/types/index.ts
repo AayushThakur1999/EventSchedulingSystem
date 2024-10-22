@@ -8,7 +8,7 @@ export type AsyncRequestHandler = (
   next: NextFunction
 ) => Promise<any>;
 
-export interface IUser {
+export interface IUser extends Document<Types.ObjectId> {
   fullname: string;
   username: string;
   email: string;
@@ -23,19 +23,20 @@ export interface IUserMethods {
   generateRefreshToken(): string;
 }
 
-// Updated: Explicitly include _id in UserDocument
-export interface UserDocument extends Document, IUser, IUserMethods {
-  _id: Types.ObjectId;
+export type UserModel = Model<IUser, {}, IUserMethods>;
+
+export interface LoginRequestBody {
+  username?: string;
+  email?: string;
+  password: string;
+  isAdmin?: boolean;
 }
 
-// Updated: Change UserModel to interface and extend Model<UserDocument>
-export interface UserModel extends Model<UserDocument> {
-  // Add any static methods here if needed
-  // For example:
-  // findByEmail(email: string): Promise<UserDocument | null>;
-}
-
-// used as type for decoded Jwt token based on generateAccessToken method in userSchema
+/**
+ * Used as type for decoded Jwt token based on generateAccessToken method
+ * and generateRefreshToken method where the latter only uses _id as payload
+ * and the former uses all 4 properties 
+ **/
 export interface TokensJwtPayload extends JwtPayload {
   _id: string;
   email?: string;

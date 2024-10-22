@@ -1,6 +1,7 @@
+import { Request, Response } from "express";
 import { cookieOptions } from "../constants";
 import { User } from "../models/user.model";
-import { TokensJwtPayload } from "../types";
+import { LoginRequestBody, TokensJwtPayload } from "../types";
 import {
   ApiError,
   AsyncHandler,
@@ -25,7 +26,8 @@ export const registerUser = AsyncHandler(async (req, res) => {
   if (
     [fullname, username, email, password].some(
       // We are using loose equality here because null == undefined is true
-      (field) => field == null || (typeof field === "string" && field.trim() === "")
+      (field) =>
+        field == null || (typeof field === "string" && field.trim() === "")
     )
   ) {
     throw new ApiError(400, "All fields are required!");
@@ -65,65 +67,67 @@ export const registerUser = AsyncHandler(async (req, res) => {
     .json(new ApiResponse(200, createdUser, "User created successfully!"));
 });
 
-export const loginUser = AsyncHandler(async (req, res) => {
-  // Take input fields from user
-  // Check if any field is empty
-  // Find the user in the DB, if not found throw error
-  // Check the case when user is admin
-  // Compare the password to that in DB
-  // If the details are correct create access and refresh tokens else throw an error
-  // send cookies and response
+export const loginUser = AsyncHandler(
+  async (req: Request<{}, {}, LoginRequestBody>, res: Response) => {
+    // Take input fields from user
+    // Check if any field is empty
+    // Find the user in the DB, if not found throw error
+    // Check the case when user is admin
+    // Compare the password to that in DB
+    // If the details are correct create access and refresh tokens else throw an error
+    // send cookies and response
 
-  const { username, email, password, isAdmin } = req.body;
+    const { username, email, password, isAdmin } = req.body;
 
-  if (!(username || email) || !password) {
-    throw new ApiError(
-      400,
-      "Both username or email and password are required."
+    if (!(username || email) || !password) {
+      throw new ApiError(
+        400,
+        "Both username or email and password are required."
+      );
+    }
+
+    const user = await User.findOne({
+      $or: [{ username }, { email }],
+    });
+
+    if (!user) {
+      throw new ApiError(400, "User does not exist :(");
+    }
+
+    if (isAdmin !== user.isAdmin && isAdmin === false) {
+      throw new ApiError(404, "No such user exists!");
+    }
+    if (isAdmin !== user.isAdmin && isAdmin === true) {
+      throw new ApiError(404, "No such admin exists!");
+    }
+
+    const isPasswordValid = await user.isPasswordCorrect(password);
+
+    if (!isPasswordValid) {
+      throw new ApiError(401, "Invalid user credentials!");
+    }
+
+    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
+      user._id
     );
-  }
 
-  const user = await User.findOne({
-    $or: [{ username }, { email }],
-  });
-
-  if (!user) {
-    throw new ApiError(400, "User does not exist :(");
-  }
-
-  if (isAdmin !== user.isAdmin && isAdmin === false) {
-    throw new ApiError(404, "No such user exists!");
-  }
-  if (isAdmin !== user.isAdmin && isAdmin === true) {
-    throw new ApiError(404, "No such admin exists!");
-  }
-
-  const isPasswordValid = await user.isPasswordCorrect(password);
-
-  if (!isPasswordValid) {
-    throw new ApiError(401, "Invalid user credentials!");
-  }
-
-  const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
-    user._id
-  );
-
-  const loggedInUser = await User.findById(user._id).select(
-    "-password -refreshToken"
-  );
-
-  return res
-    .status(200)
-    .cookie("accessToken", accessToken, cookieOptions)
-    .cookie("refreshToken", refreshToken, cookieOptions)
-    .json(
-      new ApiResponse(
-        200,
-        { user: loggedInUser, accessToken, refreshToken },
-        "User logged-in successfully!"
-      )
+    const loggedInUser = await User.findById(user._id).select(
+      "-password -refreshToken"
     );
-});
+
+    return res
+      .status(200)
+      .cookie("accessToken", accessToken, cookieOptions)
+      .cookie("refreshToken", refreshToken, cookieOptions)
+      .json(
+        new ApiResponse(
+          200,
+          { user: loggedInUser, accessToken, refreshToken },
+          "User logged-in successfully!"
+        )
+      );
+  }
+);
 
 export const logoutUser = AsyncHandler(async (req, res) => {
   await User.findByIdAndUpdate(
@@ -167,10 +171,10 @@ export const refreshAccessToken = AsyncHandler(async (req, res) => {
       "ACCESS_TOKEN_SECRET is not defined in environment variables"
     );
   }
-  const decodedToken = (await jwt.verify(
+  const decodedToken = jwt.verify(
     incomingRefreshToken,
     secret
-  )) as TokensJwtPayload;
+  ) as TokensJwtPayload;
 
   const user = await User.findById(decodedToken?._id);
 

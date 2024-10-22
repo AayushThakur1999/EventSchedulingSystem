@@ -3,7 +3,7 @@ import { User } from "../models/user.model";
 import { ApiError } from "./ApiError";
 
 export const generateAccessAndRefreshTokens = async (
-  userId: Types.ObjectId | string
+  userId: Types.ObjectId
 ): Promise<{ accessToken: string; refreshToken: string }> => {
   try {
     const user = await User.findById(userId);

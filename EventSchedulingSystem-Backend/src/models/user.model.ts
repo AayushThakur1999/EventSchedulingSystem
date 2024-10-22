@@ -1,9 +1,9 @@
 import { Schema, model } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { UserDocument, UserModel } from "../types";
+import { IUser, IUserMethods, UserModel } from "../types";
 
-const userSchema = new Schema<UserDocument, UserModel>(
+const userSchema = new Schema<IUser, UserModel, IUserMethods>(
   {
     fullname: {
       type: String,
@@ -22,6 +22,7 @@ const userSchema = new Schema<UserDocument, UserModel>(
     email: {
       type: String,
       required: true,
+      unique: true,
       lowercase: true,
       trim: true,
       index: true,
@@ -42,7 +43,7 @@ const userSchema = new Schema<UserDocument, UserModel>(
 );
 
 // encrypts the password just before saving/changing it
-userSchema.pre("save", async function (next) {
+userSchema.pre<IUser>("save", async function (next) {
   if (this.isModified("password")) {
     this.password = await bcrypt.hash(this.password, 10);
   }
@@ -82,4 +83,4 @@ userSchema.methods.generateRefreshToken = function (): string {
   );
 };
 
-export const User = model<UserDocument, UserModel>("User", userSchema);
+export const User = model<IUser, UserModel>("User", userSchema);
