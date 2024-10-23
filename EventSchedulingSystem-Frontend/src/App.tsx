@@ -5,12 +5,17 @@ import {
   Login,
   Register,
   UserAvailability,
+  Error,
+  Landing
 } from "./Pages";
-import { Error } from "./Pages";
-import { action as registerAction } from "./Pages/Register";
-import { action as loginAction } from "./Pages/Login";
+import { loginAction, registerAction, userLoader } from "./Utils";
 
 const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Landing />,
+    errorElement: <Error />,
+  },
   {
     path: "login",
     element: <Login />,
@@ -26,15 +31,16 @@ const router = createBrowserRouter([
   {
     path: "user/:id",
     element: <UserAvailability />,
+    loader: userLoader,
     errorElement: <Error />,
   },
   {
-    path: "admin",
+    path: "admin/:id",
     element: <Admin />,
     errorElement: <Error />,
   },
   {
-    path: "admin/user/:id",
+    path: "admin/:id/user/:userId",
     element: <EventAllotment />,
     errorElement: <Error />,
   },
@@ -43,4 +49,5 @@ const router = createBrowserRouter([
 const App = () => {
   return <RouterProvider router={router} />;
 };
+
 export default App;

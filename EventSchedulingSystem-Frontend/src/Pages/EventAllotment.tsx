@@ -22,9 +22,9 @@
 import { useState } from "react";
 import { Calendar, Clock } from "lucide-react";
 import { useLocation } from "react-router-dom";
-import { TimeObject } from "../Types/Types";
-import { convertTo24HourFormat } from "../Utils/Utils";
+import { TimeObject } from "../Types";
 import { FormInput } from "../Components";
+import { convertTo24HourFormat } from "../Utils";
 
 const timeSlots = [
   "12:00:00 AM",

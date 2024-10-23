@@ -29,3 +29,11 @@ export type TimeObject = {
   endTime: string;
   startTime: string;
 };
+
+export type UserData = {
+  _id: string;
+  fullname: string;
+  username: string;
+  email: string;
+  isAdmin: string;
+};

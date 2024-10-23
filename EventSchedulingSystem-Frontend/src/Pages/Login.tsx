@@ -1,40 +1,9 @@
-import { Form, Link, redirect } from "react-router-dom";
+import { Form, Link } from "react-router-dom";
 import { FormInput, SubmitBtn } from "../Components";
 import { useState } from "react";
-import axios from "axios";
-import { toast } from "react-toastify";
-
-export const action = async ({ request }: { request: Request }) => {
-  const formData = await request.formData();
-  const data = Object.fromEntries(formData);
-
-  const isAdmin = formData.has("isAdmin");
-  const loginData = { ...data, isAdmin };
-  console.log(loginData);
-  try {
-    const response = await axios.post("/users/login", loginData, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    console.log("response", response);
-    toast(response.data?.message || "You have logged-in successfully :)");
-    if (response.data.data.user.isAdmin) {
-      return redirect("/admin");
-    } else {
-      return redirect("/user/1");
-    }
-  } catch (error) {
-    console.error("Error::", error);
-    if (error instanceof Error) {
-      throw new Error(error.message)
-    }
-  }
-};
 
 const Login = () => {
   const [usernameLogin, setUsernameLogin] = useState(false);
-  
   return (
     <section className="h-screen grid place-items-center">
       <Form

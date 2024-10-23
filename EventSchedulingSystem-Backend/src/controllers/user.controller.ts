@@ -91,7 +91,7 @@ export const loginUser = AsyncHandler(
     });
 
     if (!user) {
-      throw new ApiError(400, "User does not exist :(");
+      throw new ApiError(404, "User does not exist :(");
     }
 
     if (isAdmin !== user.isAdmin && isAdmin === false) {

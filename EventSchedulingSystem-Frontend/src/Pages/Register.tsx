@@ -1,28 +1,6 @@
-import { Form, Link, redirect } from "react-router-dom";
+import { Form, Link } from "react-router-dom";
 import { FormInput, SubmitBtn } from "../Components";
 
-import { toast } from "react-toastify";
-import axios from "axios";
-
-export const action = async ({ request }: { request: Request }) => {
-  const formData = await request.formData();
-  const data = Object.fromEntries(formData);
-  console.log(data);
-  try {
-    const response = await axios.post("/users/register", data, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    console.log("Success Response:", response);
-    toast("Successfully registered!! ");
-    return redirect("/login");
-  } catch (error) {
-    console.error("ERROR:--", error);
-  }
-};
-
-//Warning: Because you're using action above so don't use action attribute in Form component
 const Register = () => {
   return (
     <section className="h-screen grid place-items-center">
@@ -48,4 +26,5 @@ const Register = () => {
     </section>
   );
 };
+
 export default Register;

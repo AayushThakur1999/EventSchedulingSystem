@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { users } from "../../userData";
-import { TimeObject, UserNameAndDateBasedUsersData } from "../Types/Types";
+import { TimeObject, UserNameAndDateBasedUsersData } from "../Types";
+import { convertTo24HourFormat } from "../Utils";
 
 const Admin = () => {
   //   const groupUsersByName = (users: User[]) => {
@@ -119,23 +120,6 @@ const Admin = () => {
     }
   );
   console.log("SORTED DATA:", sortedData);
-
-  // Helper function to convert 12-hour time to 24-hour format
-  function convertTo24HourFormat(time: string): string {
-    const [timePart, modifier] = time.split(" ");
-    // console.log(timePart.split(":"));
-
-    const [tempHours, minutes, seconds] = timePart.split(":"); // 'hours' may change, so it's kept as let.
-    let hours = tempHours;
-    // Convert "12" hour correctly
-    if (hours === "12") {
-      hours = modifier === "AM" ? "00" : "12";
-    } else if (modifier === "PM") {
-      hours = String(Number(hours) + 12);
-    }
-
-    return `${hours.padStart(2, "0")}:${minutes}:${seconds}`;
-  }
 
   return (
     <section className="min-h-screen bg-gradient-to-b from-base-200 to-base-300 text-base-content">

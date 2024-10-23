@@ -3,13 +3,16 @@ import { useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-import { AvailabilityProps } from "../Types/Types";
+import { AvailabilityProps, UserData } from "../Types";
 import { nanoid } from "nanoid";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLoaderData, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { Navbar } from "../Components";
 
 const UserAvailability = () => {
+  const { fullname } = useLoaderData() as UserData;
+
   const [availability, setAvailability] = useState<AvailabilityProps>({
     id: nanoid(),
     startDateAndTime: new Date(),
@@ -74,79 +77,75 @@ const UserAvailability = () => {
   };
 
   return (
-    <section className="max-w-4xl mx-auto my-8 p-8 bg-base-200 shadow-xl rounded-xl">
-      <h2 className="text-center text-4xl font-bold mb-6 text-primary">
-        Set Availability
-      </h2>
-      <div className="flex justify-between mb-6">
-        <Link to="/sessions" className="btn btn-outline btn-primary">
-          Upcoming Sessions
-        </Link>
+    <div className="max-w-5xl mx-auto py-8 grid grid-cols-1 gap-6">
+      <Navbar name={fullname} logoutUser={logoutUser} />
+      <section className="w-full mx-auto p-8 bg-base-200 shadow-xl rounded-xl">
+        <h2 className="text-center text-3xl font-semibold mb-6 text-secondary">
+          Set Availability
+        </h2>
+        <div className="flex justify-between mb-6">
+          <Link to="/sessions" className="btn btn-outline btn-accent">
+            Upcoming Sessions
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text text-xl">Start Time</span>
+            </label>
+            <DatePicker
+              selected={availability.startDateAndTime}
+              onChange={(date) => setStartDateAndTime(date as Date)}
+              showTimeSelect
+              dateFormat="Pp"
+              className="input input-bordered w-full"
+            />
+          </div>
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text text-xl">End Time</span>
+            </label>
+            <DatePicker
+              selected={availability.endDateAndTime}
+              onChange={(date) => setEndDateAndTime(date as Date)}
+              showTimeSelect
+              dateFormat="Pp"
+              className="input input-bordered w-full"
+            />
+          </div>
+        </div>
         <button
-          type="button"
-          className="btn btn-outline btn-error"
-          onClick={logoutUser}
+          onClick={updateAvailability}
+          className="btn btn-primary btn-block mt-8"
         >
-          Logout
+          Add Availability
         </button>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text text-xl">Start Time</span>
-          </label>
-          <DatePicker
-            selected={availability.startDateAndTime}
-            onChange={(date) => setStartDateAndTime(date as Date)}
-            showTimeSelect
-            dateFormat="Pp"
-            className="input input-bordered w-full"
-          />
-        </div>
-        <div className="form-control">
-          <label className="label">
-            <span className="label-text text-xl">End Time</span>
-          </label>
-          <DatePicker
-            selected={availability.endDateAndTime}
-            onChange={(date) => setEndDateAndTime(date as Date)}
-            showTimeSelect
-            dateFormat="Pp"
-            className="input input-bordered w-full"
-          />
-        </div>
-      </div>
-      <button
-        onClick={updateAvailability}
-        className="btn btn-primary btn-block mt-8"
-      >
-        Add Availability
-      </button>
 
-      {availabilityList.length > 0 && (
-        <div className="mt-12">
-          <h4 className="text-2xl font-semibold mb-4">Your Availability</h4>
-          <ul className="space-y-4">
-            {availabilityList.map((item) => (
-              <li
-                key={nanoid()}
-                className="flex items-center justify-between bg-base-100 p-4 rounded-lg shadow"
-              >
-                <span className="text-sm md:text-base">
-                  {`${item.startDateAndTime.toLocaleString()} - ${item.endDateAndTime.toLocaleString()}`}
-                </span>
-                <button
-                  onClick={() => deleteAvailability(item.id)}
-                  className="btn btn-error btn-sm"
+        {availabilityList.length > 0 && (
+          <div className="mt-12">
+            <h4 className="text-2xl font-semibold mb-4">Your Availability</h4>
+            <ul className="space-y-4">
+              {availabilityList.map((item) => (
+                <li
+                  key={nanoid()}
+                  className="flex items-center justify-between bg-base-100 p-4 rounded-lg shadow"
                 >
-                  Delete
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </section>
+                  <span className="text-sm md:text-base">
+                    {`${item.startDateAndTime.toLocaleString()} - ${item.endDateAndTime.toLocaleString()}`}
+                  </span>
+                  <button
+                    onClick={() => deleteAvailability(item.id)}
+                    className="btn btn-error btn-sm"
+                  >
+                    Delete
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </section>
+    </div>
   );
 };
 
