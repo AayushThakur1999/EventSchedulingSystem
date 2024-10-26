@@ -46,5 +46,10 @@ export const registerAction = async ({ request }: { request: Request }) => {
     return redirect("/login");
   } catch (error) {
     console.error("ERROR:--", error);
+      if (error instanceof Error) {
+        throw new Error(error.message);
+      } else {
+        throw new Error("Something went wrong while registering the user");
+      }
   }
 };

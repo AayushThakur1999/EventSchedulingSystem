@@ -1,9 +1,9 @@
-import axios from "axios";
 import { Params } from "react-router-dom";
+import api from "../Config/axios.config";
 
 export const userLoader = async ({ params }: { params: Params }) => {
   try {
-    const response = await axios("/users/current-user");
+    const response = await api.get("/users/current-user");
     const user = response.data.data;
     if (user._id === params.id) {
       return user;

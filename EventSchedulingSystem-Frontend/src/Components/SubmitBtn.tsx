@@ -7,8 +7,8 @@ const SubmitBtn = ({ text }: { text: string }) => {
   return (
     <button
       type="submit"
-      className={`btn btn-primary btn-block capitalize transition-all text-base font-semibold ${
-        isSubmitting ? "cursor-not-allowed opacity-75" : "hover:scale-105"
+      className={`btn btn-primary btn-block capitalize transition-all text-base text-slate-100 font-semibold border-neutral-300 ${
+        isSubmitting ? "cursor-not-allowed opacity-75" : "hover:scale-105 hover:bg-success hover:text-white"
       }`}
       disabled={isSubmitting}
     >
