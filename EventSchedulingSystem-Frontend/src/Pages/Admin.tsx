@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
 import { users } from "../../userData";
-import { TimeObject, UserNameAndDateBasedUsersData } from "../Types";
+import { TimeObject, UserData, UserNameAndDateBasedUsersData } from "../Types";
 import { convertTo24HourFormat } from "../Utils";
 
 const Admin = () => {
@@ -31,6 +31,7 @@ const Admin = () => {
 
   //   //   }
   //   // })
+  const { fullname } = useLoaderData() as UserData;
 
   const userNameAndDateBasedUsersData = users.reduce(
     (acc: UserNameAndDateBasedUsersData, user) => {
@@ -39,13 +40,13 @@ const Admin = () => {
         acc[user.username] = {};
       }
       // Initialize an entry for the date if it doesn't exist
-      if (!acc[user.username][user.startDate]) {
-        acc[user.username][user.startDate] = [];
+      if (!acc[user.username][user.startDateAndTime.toLocaleDateString()]) {
+        acc[user.username][user.startDateAndTime.toLocaleDateString()] = [];
       }
       // Add the user's start and end time to the respective date
-      acc[user.username][user.startDate].push({
-        startTime: user.startTime,
-        endTime: user.endTime,
+      acc[user.username][user.startDateAndTime.toLocaleDateString()].push({
+        startTime: user.startDateAndTime.toLocaleTimeString(),
+        endTime: user.endDateAndTime.toLocaleTimeString(),
       });
 
       // Sort the dates and rebuild the object in the correct order
@@ -182,12 +183,12 @@ const Admin = () => {
       </div> */}
       <div className="container mx-auto px-4 py-12">
         <h2 className="text-5xl font-extrabold text-center mb-12 text-primary">
-          Welcome, Admin
+          Welcome, Admin {fullname.split(" ")[0]}
         </h2>
         <div className="flex justify-end mb-8">
           <Link
             to="/sessions"
-            className="btn btn-primary btn-md hover:btn-secondary transition-colors duration-300"
+            className="btn btn-primary btn-md hover:btn-secondary hover:text-slate-100 transition-colors duration-300"
           >
             Upcoming Sessions
           </Link>

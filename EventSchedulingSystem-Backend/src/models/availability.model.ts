@@ -1,7 +1,12 @@
 import { Schema, model } from "mongoose";
+import { User } from "./user.model";
 
 const availabilitySchema = new Schema(
   {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: User
+    },
     startDateAndTime: {
       type: Date,
       required: true,
@@ -10,22 +15,22 @@ const availabilitySchema = new Schema(
       type: Date,
       required: true,
     },
-    startDate: {
-      type: String,
-      required: true,
-    },
-    endDate: {
-      type: String,
-      required: true,
-    },
-    startTime: {
-      type: String,
-      required: true,
-    },
-    endTime: {
-      type: String,
-      required: true,
-    },
+    // startDate: {
+    //   type: String,
+    //   required: true,
+    // },
+    // endDate: {
+    //   type: String,
+    //   required: true,
+    // },
+    // startTime: {
+    //   type: String,
+    //   required: true,
+    // },
+    // endTime: {
+    //   type: String,
+    //   required: true,
+    // },
   },
   { timestamps: true }
 );

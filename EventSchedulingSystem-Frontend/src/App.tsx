@@ -37,6 +37,7 @@ const router = createBrowserRouter([
   {
     path: "admin/:id",
     element: <Admin />,
+    loader: userLoader,
     errorElement: <Error />,
   },
   {

@@ -7,13 +7,14 @@ export interface FormInputProps<T extends string | boolean> {
 }
 
 export interface AvailabilityProps {
-  id: string;
+  _id?: string;
+  userId: string;
   startDateAndTime: Date;
   endDateAndTime: Date;
-  startDate: string;
-  endDate: string;
-  startTime: string;
-  endTime: string;
+  // startDate: string;
+  // endDate: string;
+  // startTime: string;
+  // endTime: string;
 }
 
 export type UserNameAndDateBasedUsersData = {

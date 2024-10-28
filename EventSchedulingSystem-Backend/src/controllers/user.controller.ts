@@ -14,7 +14,7 @@ export const registerUser = AsyncHandler(async (req, res) => {
   // Step 1 Get data fields from user
   // Step 2 check whether data fields are empty
   // Step 3 check whether same user exists
-  // Step 4 create user object - create entry in DBregister user's data in DB
+  // Step 4 create user object - create entry in DB, register user's data in DB
   // Step 5 remove password field from response
   // Step 6 Check for user's successful creation
   // Step 7 return response

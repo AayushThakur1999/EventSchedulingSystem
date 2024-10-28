@@ -11,17 +11,22 @@ import { toast } from "react-toastify";
 import { Navbar } from "../Components";
 
 const UserAvailability = () => {
-  const { fullname } = useLoaderData() as UserData;
+  const { fullname, _id, isAdmin } = useLoaderData() as UserData;
 
+  if (isAdmin) {
+    throw new Error(`There no user with the id:${_id}`);
+  }
   const [availability, setAvailability] = useState<AvailabilityProps>({
-    id: nanoid(),
+    userId: _id,
     startDateAndTime: new Date(),
     endDateAndTime: new Date(),
-    startDate: new Date().toLocaleDateString(),
-    endDate: new Date().toLocaleDateString(),
-    startTime: new Date().toLocaleTimeString(),
-    endTime: new Date().toLocaleTimeString(),
+    // startDate: new Date().toLocaleDateString(),
+    // endDate: new Date().toLocaleDateString(),
+    // startTime: new Date().toLocaleTimeString(),
+    // endTime: new Date().toLocaleTimeString(),
   });
+  console.log(availability);
+
   const [availabilityList, setAvailabilityList] = useState<AvailabilityProps[]>(
     []
   );
@@ -29,6 +34,11 @@ const UserAvailability = () => {
   const navigate = useNavigate();
 
   const updateAvailability = () => {
+    // console.log(
+    //   "Check for startDateAndTime to be less than endDateAndTime",
+    //   availability.startDateAndTime < availability.endDateAndTime
+    // );
+    
     setAvailabilityList((availabilityList) => [
       ...availabilityList,
       availability,
@@ -38,30 +48,37 @@ const UserAvailability = () => {
     console.log(availabilityList);
   };
 
-  const deleteAvailability = (id: string) => {
-    const updatedList = availabilityList.filter((item) => item.id !== id);
+  const deleteAvailability = (docID: string) => {
+    const updatedList = availabilityList.filter((item) => item._id !== docID);
     console.log(updatedList);
 
     setAvailabilityList(updatedList);
   };
 
   const setStartDateAndTime = (date: Date) => {
+    console.log("This is start date and time:::", date);
+    console.log("This is startDate:", date.toLocaleDateString());
+    console.log("This is startTime:", date.toLocaleTimeString());
+
     setAvailability({
       ...availability,
-      id: nanoid(),
+      userId: _id,
       startDateAndTime: date,
-      startDate: date.toLocaleDateString(),
-      startTime: date.toLocaleTimeString(),
+      // startDate: date.toLocaleDateString(),
+      // startTime: date.toLocaleTimeString(),
     });
   };
 
   const setEndDateAndTime = (date: Date) => {
+    console.log("This is end date and time:::", date);
+    console.log("This is endDate:", date.toLocaleDateString());
+    console.log("This is endTime:", date.toLocaleTimeString());
     setAvailability({
       ...availability,
-      id: nanoid(),
+      userId: _id,
       endDateAndTime: date,
-      endDate: date.toLocaleDateString(),
-      endTime: date.toLocaleTimeString(),
+      // endDate: date.toLocaleDateString(),
+      // endTime: date.toLocaleTimeString(),
     });
   };
 
@@ -134,7 +151,7 @@ const UserAvailability = () => {
                     {`${item.startDateAndTime.toLocaleString()} - ${item.endDateAndTime.toLocaleString()}`}
                   </span>
                   <button
-                    onClick={() => deleteAvailability(item.id)}
+                    onClick={() => deleteAvailability(item._id as string)}
                     className="btn btn-error btn-sm"
                   >
                     Delete
