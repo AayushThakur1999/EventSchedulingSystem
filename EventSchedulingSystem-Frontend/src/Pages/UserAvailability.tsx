@@ -72,6 +72,7 @@ const UserAvailability = () => {
         }
       }
       toast.error("Some error while trying to add availability :(");
+      throw new Error("Some error while trying to add availability :(");
     }
   };
 
@@ -102,12 +103,14 @@ const UserAvailability = () => {
     console.log("This is end date and time:::", date);
     console.log("This is endDate:", date.toLocaleDateString());
     console.log("This is endTime:", date.toLocaleTimeString());
-    setAvailability({
-      ...availability,
-      userId: userData._id,
-      endDateAndTime: date,
-      // endDate: date.toLocaleDateString(),
-      // endTime: date.toLocaleTimeString(),
+    setAvailability((prevAvailability) => {
+      return {
+        ...prevAvailability,
+        userId: userData._id,
+        endDateAndTime: date,
+        // endDate: date.toLocaleDateString(),
+        // endTime: date.toLocaleTimeString(),
+      };
     });
   };
 
