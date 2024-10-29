@@ -1,23 +1,24 @@
 import { useState } from "react";
+import axios, { AxiosError } from "axios";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-import { AvailabilityProps, UserData } from "../Types";
+import { AvailabilityProps, userLoaderData } from "../Types";
 import { nanoid } from "nanoid";
 import { Link, useLoaderData, useNavigate } from "react-router-dom";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { Navbar } from "../Components";
+import { dateOptions } from "../Utils/Utils";
 
 const UserAvailability = () => {
-  const { fullname, _id, isAdmin } = useLoaderData() as UserData;
+  const { userData, userAvailabilities } = useLoaderData() as userLoaderData;
 
-  if (isAdmin) {
-    throw new Error(`There no user with the id:${_id}`);
+  if (userData.isAdmin) {
+    throw new Error(`There no user with the id:${userData._id}`);
   }
   const [availability, setAvailability] = useState<AvailabilityProps>({
-    userId: _id,
+    userId: userData._id,
     startDateAndTime: new Date(),
     endDateAndTime: new Date(),
     // startDate: new Date().toLocaleDateString(),
@@ -27,25 +28,51 @@ const UserAvailability = () => {
   });
   console.log(availability);
 
-  const [availabilityList, setAvailabilityList] = useState<AvailabilityProps[]>(
-    []
-  );
+  const [availabilityList, setAvailabilityList] =
+    useState<AvailabilityProps[]>(userAvailabilities);
 
   const navigate = useNavigate();
 
-  const updateAvailability = () => {
+  const updateAvailability = async () => {
     // console.log(
     //   "Check for startDateAndTime to be less than endDateAndTime",
     //   availability.startDateAndTime < availability.endDateAndTime
     // );
-    
-    setAvailabilityList((availabilityList) => [
-      ...availabilityList,
-      availability,
-    ]);
-    console.log("updateAvailability RAN!");
-
-    console.log(availabilityList);
+    try {
+      const response = await axios.post(
+        "/availability/add-availability",
+        availability,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log("AddAvailability::", response);
+      const availabilityDoc = response.data.data;
+      setAvailabilityList((availabilityList) => [
+        ...availabilityList,
+        availabilityDoc,
+      ]);
+      toast.success(response.data.message);
+      console.log("updateAvailability RAN!");
+      console.log(availabilityList);
+    } catch (error) {
+      console.error("Error::", error);
+      if (error instanceof AxiosError) {
+        if (error.status === 400) {
+          toast.error("Trying to provide invalid/inadmissible data!");
+          throw new Error(error.message);
+        }
+        if (error.status === 409) {
+          toast.error(
+            "Conflicts between the provided time slot and available time slots!"
+          );
+          throw new Error(error.message);
+        }
+      }
+      toast.error("Some error while trying to add availability :(");
+    }
   };
 
   const deleteAvailability = (docID: string) => {
@@ -60,12 +87,14 @@ const UserAvailability = () => {
     console.log("This is startDate:", date.toLocaleDateString());
     console.log("This is startTime:", date.toLocaleTimeString());
 
-    setAvailability({
-      ...availability,
-      userId: _id,
-      startDateAndTime: date,
-      // startDate: date.toLocaleDateString(),
-      // startTime: date.toLocaleTimeString(),
+    setAvailability((prevAvailability) => {
+      return {
+        ...prevAvailability,
+        userId: userData._id,
+        startDateAndTime: date,
+        // startDate: date.toLocaleDateString(),
+        // startTime: date.toLocaleTimeString(),
+      };
     });
   };
 
@@ -75,7 +104,7 @@ const UserAvailability = () => {
     console.log("This is endTime:", date.toLocaleTimeString());
     setAvailability({
       ...availability,
-      userId: _id,
+      userId: userData._id,
       endDateAndTime: date,
       // endDate: date.toLocaleDateString(),
       // endTime: date.toLocaleTimeString(),
@@ -95,7 +124,7 @@ const UserAvailability = () => {
 
   return (
     <div className="max-w-5xl mx-auto py-8 grid grid-cols-1 gap-6">
-      <Navbar name={fullname} logoutUser={logoutUser} />
+      <Navbar name={userData.fullname} logoutUser={logoutUser} />
       <section className="w-full mx-auto p-8 bg-base-200 shadow-xl rounded-xl">
         <h2 className="text-center text-3xl font-semibold mb-6 text-secondary">
           Set Availability
@@ -114,6 +143,7 @@ const UserAvailability = () => {
               selected={availability.startDateAndTime}
               onChange={(date) => setStartDateAndTime(date as Date)}
               showTimeSelect
+              timeIntervals={15}
               dateFormat="Pp"
               className="input input-bordered w-full"
             />
@@ -126,6 +156,7 @@ const UserAvailability = () => {
               selected={availability.endDateAndTime}
               onChange={(date) => setEndDateAndTime(date as Date)}
               showTimeSelect
+              timeIntervals={15}
               dateFormat="Pp"
               className="input input-bordered w-full"
             />
@@ -148,7 +179,7 @@ const UserAvailability = () => {
                   className="flex items-center justify-between bg-base-100 p-4 rounded-lg shadow"
                 >
                   <span className="text-sm md:text-base">
-                    {`${item.startDateAndTime.toLocaleString()} - ${item.endDateAndTime.toLocaleString()}`}
+                    {`${new Date(item.startDateAndTime).toLocaleString("en-GB", dateOptions)} -to- ${new Date(item.endDateAndTime).toLocaleString("en-GB", dateOptions)}`}
                   </span>
                   <button
                     onClick={() => deleteAvailability(item._id as string)}

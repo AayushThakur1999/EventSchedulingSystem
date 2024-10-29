@@ -54,15 +54,41 @@ api.interceptors.request.use(
   }
 );
 
+// Helper function to determine if we should retry the request
+const shouldRetryRequest = (error: AxiosError, retryCount: number): boolean => {
+  const MAX_RETRIES = 3;
+
+  // Don't retry if:
+  // 1. We've reached max retries
+  // 2. It's a 401 error (unauthorized)
+  // 3. There's no response (network error)
+  if (
+    retryCount >= MAX_RETRIES ||
+    error.response?.status === 401 ||
+    error.response?.status === 404 ||
+    !error.response
+  ) {
+    return false;
+  }
+
+  return true;
+};
+
 // Add response interceptor
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
+      retryCount?: number;
     };
 
-    // If error is 401 and we haven't tried refreshing yet
+    // Initialize retryCount if it doesn't exist
+    if (originalRequest.retryCount === undefined) {
+      originalRequest.retryCount = 0;
+    }
+
+    // Handle 401 errors and token refresh
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
@@ -101,6 +127,24 @@ api.interceptors.response.use(
       });
     }
 
+    // Check if we should retry the request using the helper function
+    if (shouldRetryRequest(error, originalRequest.retryCount)) {
+      originalRequest.retryCount += 1;
+      const retryDelay = 1000 * Math.pow(2, originalRequest.retryCount); // Exponential backoff
+
+      console.error(
+        `Error executing request, retrying (attempt ${originalRequest.retryCount}): `,
+        error
+      );
+
+      // Wait for the delay
+      await new Promise((resolve) => setTimeout(resolve, retryDelay));
+
+      // Retry the request
+      return api(originalRequest);
+    }
+
+    // If we shouldn't retry or have exhausted all retries, reject with the error
     return Promise.reject(error);
   }
 );

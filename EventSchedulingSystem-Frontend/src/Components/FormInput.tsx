@@ -26,7 +26,9 @@ const FormInput = <T extends string | boolean>({
 
   const getAutocomplete = () => {
     if (type === "password") {
-      return name === "newPassword" ? "new-password" : "current-password";
+      return name === "newPassword" || name === "newPasswordConfirmation"
+        ? "new-password"
+        : "current-password";
     }
     if (type === "email") {
       return "email";
@@ -60,7 +62,7 @@ const FormInput = <T extends string | boolean>({
           checked={isCheckbox ? (value as boolean) : undefined}
           value={!isCheckbox ? (value as string) : undefined}
           onChange={handleChange}
-          autoComplete={isCheckbox ? undefined : getAutocomplete()}
+          autoComplete={getAutocomplete()}
           required={!isCheckbox}
         />
         {isPassword && (

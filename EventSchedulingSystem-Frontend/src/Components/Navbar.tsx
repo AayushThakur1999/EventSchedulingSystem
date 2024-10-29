@@ -34,7 +34,7 @@ const Navbar = ({
       });
       console.log("User Detail updated Response:", response);
       const user = response.data.data;
-      toast.success("Successfully registered!! ");
+      toast.success("Successfully Updated Details!! ");
       navigate(`/user/${user._id}`);
       closeModal();
     } catch (error) {
@@ -131,6 +131,14 @@ const Navbar = ({
       <Modal isOpen={modalContent === "Change Password"} onClose={closeModal}>
         <h2 className="text-xl font-bold mt-2">Change Your Password</h2>
         <Form method="POST" onSubmit={submitPasswordChange}>
+          {/* Hidden username input for accessibility */}
+          <input
+            type="text"
+            name="username"
+            autoComplete="username"
+            style={{ display: "none" }}
+          />
+
           <FormInput
             type="password"
             label="current password"

@@ -13,3 +13,9 @@ export function convertTo24HourFormat(time: string): string {
 
   return `${hours.padStart(2, "0")}:${minutes}:${seconds}`;
 }
+
+export const dateOptions: Intl.DateTimeFormatOptions = {
+  dateStyle: "full",
+  timeStyle: "short",
+  hour12: true,
+};

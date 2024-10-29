@@ -38,3 +38,8 @@ export type UserData = {
   email: string;
   isAdmin: string;
 };
+
+export type userLoaderData = {
+  userData: UserData;
+  userAvailabilities: Array<AvailabilityProps>;
+};
