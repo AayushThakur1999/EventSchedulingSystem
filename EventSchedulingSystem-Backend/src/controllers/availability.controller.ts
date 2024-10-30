@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Availability } from "../models/availability.model";
 import { ApiError, ApiResponse, AsyncHandler } from "../utils";
 
@@ -120,6 +121,29 @@ export const getUserAvailabilities = AsyncHandler(async (req, res) => {
         200,
         availabilityList,
         "Fetched user availabilities successfully :)"
+      )
+    );
+});
+
+export const deleteUserAvailability = AsyncHandler(async (req, res) => {
+  const { docID } = req.params;
+  if (!mongoose.isObjectIdOrHexString(docID)) {
+    throw new ApiError(400, "Invalid syntax for the availability document ID!");
+  }
+
+  const deletionResponse = await Availability.deleteOne({ _id: docID });
+
+  if (deletionResponse.deletedCount === 0) {
+    throw new ApiError(400, "No such user availability found!");
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        deletionResponse,
+        "User availability deleted successfully!"
       )
     );
 });

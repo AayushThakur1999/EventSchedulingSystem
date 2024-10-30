@@ -76,11 +76,27 @@ const UserAvailability = () => {
     }
   };
 
-  const deleteAvailability = (docID: string) => {
-    const updatedList = availabilityList.filter((item) => item._id !== docID);
-    console.log(updatedList);
+  const deleteAvailability = async (docID: string) => {
+    console.log("docID", docID);
 
-    setAvailabilityList(updatedList);
+    try {
+      const response = await axios.delete(
+        `/availability/deleteAvailability/${docID}`
+      );
+      console.log(response);
+      const updatedList = availabilityList.filter((item) => item._id !== docID);
+      console.log("List after deletion", updatedList);
+      setAvailabilityList(updatedList);
+      toast.success(response.data.message);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        toast.error(error.message);
+        console.error(error.message);
+        throw new Error(error.message);
+      }
+      toast.error("Something went wrong while deleting availability");
+      throw new Error("Something went wrong while deleting availability");
+    }
   };
 
   const setStartDateAndTime = (date: Date) => {
