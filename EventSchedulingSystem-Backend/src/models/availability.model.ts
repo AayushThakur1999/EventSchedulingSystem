@@ -1,11 +1,20 @@
 import { Schema, model } from "mongoose";
 import { User } from "./user.model";
+import {
+  AvailabilityModel,
+  IAvailability,
+  IAvailabilityMethods,
+} from "../types";
 
-const availabilitySchema = new Schema(
+const availabilitySchema = new Schema<
+  IAvailability,
+  AvailabilityModel,
+  IAvailabilityMethods
+>(
   {
     userId: {
       type: Schema.Types.ObjectId,
-      ref: User
+      ref: User,
     },
     startDateAndTime: {
       type: Date,
@@ -35,4 +44,7 @@ const availabilitySchema = new Schema(
   { timestamps: true }
 );
 
-export const Availability = model("Availability", availabilitySchema);
+export const Availability = model<IAvailability, AvailabilityModel>(
+  "Availability",
+  availabilitySchema
+);

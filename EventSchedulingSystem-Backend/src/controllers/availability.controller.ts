@@ -49,7 +49,7 @@ export const addAvailability = AsyncHandler(async (req, res) => {
   // IN OTHER WORDS
   // checking whether the date object is available or not
 
-  const overlappingAvailability = await Availability.find({
+  const overlappingAvailability = await Availability.findOne({
     userId,
     // checks for events :
     // - where both startDateAndTime and endDateAndTime fall on or bt/w starting d&t(date and time) and ending d&t respectively.
@@ -60,7 +60,7 @@ export const addAvailability = AsyncHandler(async (req, res) => {
     endDateAndTime: { $gt: startDnT },
   });
 
-  if (overlappingAvailability.length) {
+  if (overlappingAvailability) {
     throw new ApiError(
       409,
       "Your new availability is conflicting with the already present schedule!!"
@@ -110,7 +110,7 @@ export const getUserAvailabilities = AsyncHandler(async (req, res) => {
     userId,
     endDateAndTime: { $lt: new Date() },
   });
-  console.log(removedAvailabilities);
+  // console.log(removedAvailabilities);
 
   const availabilityList = await Availability.find({ userId });
 
@@ -144,6 +144,32 @@ export const deleteUserAvailability = AsyncHandler(async (req, res) => {
         200,
         deletionResponse,
         "User availability deleted successfully!"
+      )
+    );
+});
+
+export const getAllUserAvailabilities = AsyncHandler(async (req, res) => {
+  const allAvailabilities = await Availability.find()
+    .populate({
+      path: "userId",
+      select: "fullname username", // Select only the fullname field from User
+    })
+    .select("userId startDateAndTime endDateAndTime"); // Select specific fields from Availability
+  // console.log("AllAvailabilities", allAvailabilities);
+
+  if (!allAvailabilities || !allAvailabilities.length) {
+    throw new ApiError(
+      500,
+      "Some error occurred while trying to get all user's availability"
+    );
+  }
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        allAvailabilities,
+        "Successfully fetched all user's availabilities!"
       )
     );
 });

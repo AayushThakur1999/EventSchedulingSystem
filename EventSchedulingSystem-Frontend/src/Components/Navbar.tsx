@@ -9,9 +9,11 @@ import axios from "axios";
 const Navbar = ({
   name,
   logoutUser,
+  isAdmin = false,
 }: {
   name: string;
   logoutUser: () => void;
+  isAdmin?: boolean;
 }) => {
   const navigate = useNavigate();
   const [modalContent, setModalContent] = useState<string | null>(null);
@@ -19,6 +21,7 @@ const Navbar = ({
   const handleUpdateDetails = () => setModalContent("Update Details");
   const handleChangePassword = () => setModalContent("Change Password");
   const handleLogout = () => setModalContent("Logout");
+  const handleRegistration = () => setModalContent("Register New");
 
   const closeModal = () => setModalContent(null);
 
@@ -84,7 +87,7 @@ const Navbar = ({
   };
 
   return (
-    <div className="navbar bg-base-100">
+    <div className="navbar bg-inherit">
       <div className="flex-1">
         <h2 className="text-4xl font-bold text-primary">Welcome, {name}</h2>
       </div>
@@ -112,6 +115,11 @@ const Navbar = ({
             <li>
               <a onClick={handleLogout}>Logout</a>
             </li>
+            {isAdmin && (
+              <li>
+                <a onClick={handleRegistration}>Register New</a>
+              </li>
+            )}
           </ul>
         </div>
       </div>
@@ -166,6 +174,19 @@ const Navbar = ({
           Logout
         </button>
       </Modal>
+
+      {isAdmin && (
+        <Modal isOpen={modalContent === "Register New"} onClose={closeModal}>
+          <h2 className="text-xl font-bold mt-2">New Registration</h2>
+          <p>Do you want to register a new user?</p>
+          <button
+            className="btn btn-sm btn-primary mt-4 text-slate-100 border-neutral-300 hover:scale-105 hover:bg-error"
+            onClick={() => navigate("register")}
+          >
+            Go to Registeration Page
+          </button>
+        </Modal>
+      )}
     </div>
   );
 };

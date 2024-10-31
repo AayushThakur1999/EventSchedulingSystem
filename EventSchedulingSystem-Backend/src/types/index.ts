@@ -8,6 +8,7 @@ export type AsyncRequestHandler = (
   next: NextFunction
 ) => Promise<any>;
 
+// added Document<Types.ObjectId> so that '_id' is identified as a property of IUser
 export interface IUser extends Document<Types.ObjectId> {
   fullname: string;
   username: string;
@@ -17,13 +18,23 @@ export interface IUser extends Document<Types.ObjectId> {
   refreshToken?: string;
 }
 
+export interface IAvailability extends Document<Types.ObjectId> {
+  userId: Types.ObjectId;
+  startDateAndTime: Date;
+  endDateAndTime: Date;
+}
+
 export interface IUserMethods {
   isPasswordCorrect(password: string): Promise<boolean>;
   generateAccessToken(): string;
   generateRefreshToken(): string;
 }
 
+export interface IAvailabilityMethods {}
+
 export type UserModel = Model<IUser, {}, IUserMethods>;
+
+export type AvailabilityModel = Model<IAvailability, {}, IAvailabilityMethods>;
 
 export interface LoginRequestBody {
   username?: string;
@@ -35,7 +46,7 @@ export interface LoginRequestBody {
 /**
  * Used as type for decoded Jwt token based on generateAccessToken method
  * and generateRefreshToken method where the latter only uses _id as payload
- * and the former uses all 4 properties 
+ * and the former uses all 4 properties
  **/
 export interface TokensJwtPayload extends JwtPayload {
   _id: string;

@@ -36,10 +36,25 @@ export type UserData = {
   fullname: string;
   username: string;
   email: string;
-  isAdmin: string;
+  isAdmin: boolean;
 };
 
 export type userLoaderData = {
   userData: UserData;
   userAvailabilities: Array<AvailabilityProps>;
+};
+
+export type UserAndAvailabilityData = {
+  _id: string;
+  userId: {
+    _id: string;
+    fullname: string;
+    username: string;
+  };
+  startDateAndTime: string;
+  endDateAndTime: string;
+};
+export type adminLoaderData = {
+  userData: UserData;
+  allUsersAvailabilities: Array<UserAndAvailabilityData>;
 };

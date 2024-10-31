@@ -1,7 +1,14 @@
-import { Link, useLoaderData } from "react-router-dom";
-import { users } from "../../userData";
-import { TimeObject, UserData, UserNameAndDateBasedUsersData } from "../Types";
+import { Link, useLoaderData, useNavigate } from "react-router-dom";
+// import { users } from "../../userData";
+import {
+  adminLoaderData,
+  TimeObject,
+  UserNameAndDateBasedUsersData,
+} from "../Types";
 import { convertTo24HourFormat } from "../Utils";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { Navbar } from "../Components";
 
 const Admin = () => {
   //   const groupUsersByName = (users: User[]) => {
@@ -31,38 +38,54 @@ const Admin = () => {
 
   //   //   }
   //   // })
-  const { fullname } = useLoaderData() as UserData;
+  const { userData, allUsersAvailabilities } =
+    useLoaderData() as adminLoaderData;
+  console.log(
+    "Userdata and allUserAvailabilities",
+    userData,
+    allUsersAvailabilities
+  );
 
-  const userNameAndDateBasedUsersData = users.reduce(
+  const userNameAndDateBasedUsersData = allUsersAvailabilities.reduce(
     (acc: UserNameAndDateBasedUsersData, user) => {
       // Initialize an entry for the username if it doesn't exist
-      if (!acc[user.username]) {
-        acc[user.username] = {};
+      if (!acc[user.userId.username]) {
+        acc[user.userId.username] = {};
       }
       // Initialize an entry for the date if it doesn't exist
-      if (!acc[user.username][user.startDateAndTime.toLocaleDateString()]) {
-        acc[user.username][user.startDateAndTime.toLocaleDateString()] = [];
+      if (
+        !acc[user.userId.username][
+          new Date(user.startDateAndTime).toLocaleDateString()
+        ]
+      ) {
+        acc[user.userId.username][
+          new Date(user.startDateAndTime).toLocaleDateString()
+        ] = [];
       }
       // Add the user's start and end time to the respective date
-      acc[user.username][user.startDateAndTime.toLocaleDateString()].push({
-        startTime: user.startDateAndTime.toLocaleTimeString(),
-        endTime: user.endDateAndTime.toLocaleTimeString(),
+      acc[user.userId.username][
+        new Date(user.startDateAndTime).toLocaleDateString()
+      ].push({
+        startTime: new Date(user.startDateAndTime).toLocaleTimeString(),
+        endTime: new Date(user.endDateAndTime).toLocaleTimeString(),
       });
 
       // Sort the dates and rebuild the object in the correct order
-      const sortedDates = Object.keys(acc[user.username]).sort((a, b) => {
-        return new Date(a).getTime() - new Date(b).getTime();
-      });
+      const sortedDates = Object.keys(acc[user.userId.username]).sort(
+        (a, b) => {
+          return new Date(a).getTime() - new Date(b).getTime();
+        }
+      );
       // console.log("sortedDates", sortedDates);
 
       // Rebuild the object with sorted dates
       const sortedDateEntries: { [key: string]: TimeObject[] } = {};
       sortedDates.forEach((date) => {
-        sortedDateEntries[date] = acc[user.username][date];
+        sortedDateEntries[date] = acc[user.userId.username][date];
       });
       // console.log("sortedDateEntries", sortedDateEntries);
 
-      acc[user.username] = sortedDateEntries;
+      acc[user.userId.username] = sortedDateEntries;
       return acc;
     },
     {}
@@ -122,8 +145,21 @@ const Admin = () => {
   );
   console.log("SORTED DATA:", sortedData);
 
+  const navigate = useNavigate();
+
+  const logoutUser = async () => {
+    try {
+      const response = await axios.post("/users/logout", {});
+      console.log(response);
+      toast(response.data?.message || "You have Logged-Out Successfully :)");
+      navigate("/login");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
-    <section className="min-h-screen bg-gradient-to-b from-base-200 to-base-300 text-base-content">
+    <div className="min-h-screen bg-gradient-to-b from-base-200 to-base-300 text-base-content">
       {/* <div className="container mx-auto px-4 py-12">
         <h2 className="text-5xl font-extrabold text-center mb-12 text-primary">
           Welcome, Admin
@@ -181,14 +217,18 @@ const Admin = () => {
           ))}
         </div>
       </div> */}
-      <div className="container mx-auto px-4 py-12">
-        <h2 className="text-5xl font-extrabold text-center mb-12 text-primary">
-          Welcome, Admin {fullname.split(" ")[0]}
-        </h2>
+      <div className="max-w-5xl mx-auto pt-8 grid grid-cols-1 gap-6 bg-transparent">
+        <Navbar
+          name={userData.fullname}
+          logoutUser={logoutUser}
+          isAdmin={userData.isAdmin}
+        />
+      </div>
+      <section className="container mx-auto px-4 pb-12 pt-6">
         <div className="flex justify-end mb-8">
           <Link
             to="/sessions"
-            className="btn btn-primary btn-md hover:btn-secondary hover:text-slate-100 transition-colors duration-300"
+            className="btn btn-outline btn-accent btn-md hover:!text-white"
           >
             Upcoming Sessions
           </Link>
@@ -244,8 +284,8 @@ const Admin = () => {
             </div>
           ))}
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 };
 

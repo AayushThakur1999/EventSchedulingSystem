@@ -15,7 +15,9 @@ const UserAvailability = () => {
   const { userData, userAvailabilities } = useLoaderData() as userLoaderData;
 
   if (userData.isAdmin) {
-    throw new Error(`There no user with the id:${userData._id}`);
+    throw new Error(
+      `There no user with the id:${userData._id}. Are you an admin?`
+    );
   }
   const [availability, setAvailability] = useState<AvailabilityProps>({
     userId: userData._id,
@@ -149,7 +151,10 @@ const UserAvailability = () => {
           Set Availability
         </h2>
         <div className="flex justify-between mb-6">
-          <Link to="/sessions" className="btn btn-outline btn-accent">
+          <Link
+            to="/sessions"
+            className="btn btn-outline btn-accent hover:!text-white"
+          >
             Upcoming Sessions
           </Link>
         </div>
@@ -183,7 +188,7 @@ const UserAvailability = () => {
         </div>
         <button
           onClick={updateAvailability}
-          className="btn btn-primary btn-block mt-8"
+          className="btn btn-primary btn-block mt-8 btn-outline hover:!text-white"
         >
           Add Availability
         </button>
