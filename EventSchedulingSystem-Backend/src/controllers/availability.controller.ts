@@ -15,7 +15,11 @@ export const addAvailability = AsyncHandler(async (req, res) => {
     new Date(startDateAndTime),
     new Date(endDateAndTime),
   ];
-  // console.log("START AND END DnT", startDnT, endDnT);
+  // console.log(
+  //   "START AND END DnT",
+  //   startDnT.toDateString(),
+  //   endDnT.toDateString()
+  // );
 
   if (
     [userId, startDateAndTime, endDateAndTime].some(
@@ -45,6 +49,12 @@ export const addAvailability = AsyncHandler(async (req, res) => {
     );
   }
 
+  if (startDnT.toDateString() !== endDnT.toDateString()) {
+    throw new ApiError(
+      406,
+      "Please don't create time slots ranging from one date to some other date."
+    );
+  }
   // checking for overlapping date and time values
   // IN OTHER WORDS
   // checking whether the date object is available or not

@@ -66,6 +66,12 @@ const UserAvailability = () => {
           toast.error("Trying to provide invalid/inadmissible data!");
           throw new Error(error.message);
         }
+        if (error.status === 406) {
+          toast.error(
+            "Please don't create time slots ranging from one date to another."
+          );
+          throw new Error(error.message);
+        }
         if (error.status === 409) {
           toast.error(
             "Conflicts between the provided time slot and available time slots!"
