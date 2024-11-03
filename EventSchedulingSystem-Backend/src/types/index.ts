@@ -24,6 +24,18 @@ export interface IAvailability extends Document<Types.ObjectId> {
   endDateAndTime: Date;
 }
 
+export type TimeSlot = {
+  meetingStartTime: string;
+  meetingEndTime: string;
+};
+
+export interface IAttendee extends Document<Types.ObjectId> {
+  username: string;
+  schedule: Record<string, TimeSlot>;
+  eventName: string;
+  multipleAttendees: boolean;
+}
+
 export interface IUserMethods {
   isPasswordCorrect(password: string): Promise<boolean>;
   generateAccessToken(): string;
@@ -32,9 +44,13 @@ export interface IUserMethods {
 
 export interface IAvailabilityMethods {}
 
+export interface IAttendeeMethods {}
+
 export type UserModel = Model<IUser, {}, IUserMethods>;
 
 export type AvailabilityModel = Model<IAvailability, {}, IAvailabilityMethods>;
+
+export type AttendeeModel = Model<IAttendee, {}, IAttendeeMethods>;
 
 export interface LoginRequestBody {
   username?: string;

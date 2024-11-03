@@ -1,6 +1,7 @@
 import { Schema, model } from "mongoose";
+import { AttendeeModel, IAttendee, IAttendeeMethods, TimeSlot } from "../types";
 
-const timeSlotSchema = new Schema({
+const timeSlotSchema = new Schema<TimeSlot>({
   meetingStartTime: {
     type: String,
     required: true,
@@ -11,7 +12,7 @@ const timeSlotSchema = new Schema({
   },
 });
 
-const attendeeSchema = new Schema(
+const attendeeSchema = new Schema<IAttendee, AttendeeModel, IAttendeeMethods>(
   {
     username: {
       type: String,
@@ -35,4 +36,7 @@ const attendeeSchema = new Schema(
   { timestamps: true }
 );
 
-export const Attendee = model("Attendee", attendeeSchema);
+export const Attendee = model<IAttendee, AttendeeModel>(
+  "Attendee",
+  attendeeSchema
+);
