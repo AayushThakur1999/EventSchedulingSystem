@@ -1,16 +1,19 @@
 import { Schema, model } from "mongoose";
 import { AttendeeModel, IAttendee, IAttendeeMethods, TimeSlot } from "../types";
 
-const timeSlotSchema = new Schema<TimeSlot>({
-  meetingStartTime: {
-    type: String,
-    required: true,
+const timeSlotSchema = new Schema<TimeSlot>(
+  {
+    meetingStartTime: {
+      type: Date,
+      required: true,
+    },
+    meetingEndTime: {
+      type: Date,
+      required: true,
+    },
   },
-  meetingEndTime: {
-    type: String,
-    required: true,
-  },
-});
+  { _id: false }
+);
 
 const attendeeSchema = new Schema<IAttendee, AttendeeModel, IAttendeeMethods>(
   {

@@ -25,6 +25,8 @@ import { useLocation } from "react-router-dom";
 import { TimeObject } from "../Types";
 import { FormInput } from "../Components";
 import { convertTo24HourFormat } from "../Utils";
+import axios, { AxiosError } from "axios";
+import { toast } from "react-toastify";
 
 const timeSlots = [
   "12:00:00 AM",
@@ -183,27 +185,56 @@ const EventAllotment = () => {
     setMeetingEndTime(time);
   };
 
-  const handleSchedule = () => {
-    if (selectedDate && meetingStartTime && meetingEndTime && eventName) {
-      alert(
-        `${eventName} scheduled for ${selectedDate} from ${meetingStartTime} to ${meetingEndTime}`
-      );
-      // Here you would typically make an API call to save the meeting
-    }
+  const handleSchedule = async () => {
+    // if (selectedDate && meetingStartTime && meetingEndTime && eventName) {
+    //   alert(
+    //     `${eventName} scheduled for ${selectedDate} from ${meetingStartTime} to ${meetingEndTime}`
+    //   );
+    //   // Here you would typically make an API call to save the meeting
+    // }
 
     // send this data to DB
+    
     const userSchedulingData = {
       username: username,
       schedule: {
         [selectedDate]: {
-          meetingStartTime,
-          meetingEndTime,
+          meetingStartTime: new Date(`${selectedDate} ${meetingStartTime}`),
+          meetingEndTime: new Date(`${selectedDate} ${meetingEndTime}`),
         },
       },
       eventName,
       multipleAttendees,
     };
     console.log(userSchedulingData);
+    try {
+      const response = await axios.post(
+        "/attendee/add-attendee",
+        userSchedulingData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      toast.success(response.data.message || "Attendee added successfully!");
+    } catch (error) {
+      console.log(error);
+      if (error instanceof AxiosError) {
+        if (error.status === 400) {
+          toast.error("Trying to provide invalid/inadmissible data!");
+          throw new Error(error.message);
+        }
+        if (error.status === 409) {
+          toast.error(
+            "Either the time is occupied for another event or you have provided it incorrectly!"
+          );
+          throw new Error(error.message);
+        }
+      }
+      toast.error("Some error while trying to add attendee :(");
+      throw new Error("Some error while trying to add attendee :(");
+    }
   };
 
   return (

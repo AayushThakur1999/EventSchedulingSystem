@@ -25,8 +25,8 @@ export interface IAvailability extends Document<Types.ObjectId> {
 }
 
 export type TimeSlot = {
-  meetingStartTime: string;
-  meetingEndTime: string;
+  meetingStartTime: Date;
+  meetingEndTime: Date;
 };
 
 export interface IAttendee extends Document<Types.ObjectId> {

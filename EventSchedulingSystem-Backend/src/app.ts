@@ -24,9 +24,11 @@ app.use(cookieParser());
 // routes import
 import userRouter from "./routes/user.routes";
 import availabilityRouter from "./routes/availability.routes";
+import attendeeRouter from "./routes/attendee.routes";
 
 // routes declaration
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/availability", availabilityRouter);
+app.use("/api/v1/attendee", attendeeRouter);
 
 export { app };
