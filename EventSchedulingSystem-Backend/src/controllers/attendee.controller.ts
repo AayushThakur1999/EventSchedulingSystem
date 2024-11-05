@@ -88,3 +88,35 @@ export const addAttendee = AsyncHandler(async (req, res) => {
       )
     );
 });
+
+export const getEventNames = AsyncHandler(async (req, res) => {
+  const query = req.query.q;
+  
+  const similarEventNames = await Attendee.aggregate([
+    {
+      $match: {
+        eventName: { $regex: query, $options: "i" }, // Case-insensitive search
+      },
+    },
+    {
+      $group: {
+        _id: "$eventName",
+      },
+    },
+    {
+      $limit: 5, // Limit results if needed
+    },
+    {
+      $project: {
+        _id: 0,
+        eventName: "$_id",
+      },
+    },
+  ]);
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, similarEventNames, "Successfully fetched eventNames")
+    );
+});

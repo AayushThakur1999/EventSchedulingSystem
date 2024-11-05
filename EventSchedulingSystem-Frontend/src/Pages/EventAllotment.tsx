@@ -27,105 +27,8 @@ import { FormInput } from "../Components";
 import { convertTo24HourFormat } from "../Utils";
 import axios, { AxiosError } from "axios";
 import { toast } from "react-toastify";
-
-const timeSlots = [
-  "12:00:00 AM",
-  "12:15:00 AM",
-  "12:30:00 AM",
-  "12:45:00 AM",
-  "01:00:00 AM",
-  "01:15:00 AM",
-  "01:30:00 AM",
-  "01:45:00 AM",
-  "02:00:00 AM",
-  "02:15:00 AM",
-  "02:30:00 AM",
-  "02:45:00 AM",
-  "03:00:00 AM",
-  "03:15:00 AM",
-  "03:30:00 AM",
-  "03:45:00 AM",
-  "04:00:00 AM",
-  "04:15:00 AM",
-  "04:30:00 AM",
-  "04:45:00 AM",
-  "05:00:00 AM",
-  "05:15:00 AM",
-  "05:30:00 AM",
-  "05:45:00 AM",
-  "06:00:00 AM",
-  "06:15:00 AM",
-  "06:30:00 AM",
-  "06:45:00 AM",
-  "07:00:00 AM",
-  "07:15:00 AM",
-  "07:30:00 AM",
-  "07:45:00 AM",
-  "08:00:00 AM",
-  "08:15:00 AM",
-  "08:30:00 AM",
-  "08:45:00 AM",
-  "09:00:00 AM",
-  "09:15:00 AM",
-  "09:30:00 AM",
-  "09:45:00 AM",
-  "10:00:00 AM",
-  "10:15:00 AM",
-  "10:30:00 AM",
-  "10:45:00 AM",
-  "11:00:00 AM",
-  "11:15:00 AM",
-  "11:30:00 AM",
-  "11:45:00 AM",
-  "12:00:00 PM",
-  "12:15:00 PM",
-  "12:30:00 PM",
-  "12:45:00 PM",
-  "01:00:00 PM",
-  "01:15:00 PM",
-  "01:30:00 PM",
-  "01:45:00 PM",
-  "02:00:00 PM",
-  "02:15:00 PM",
-  "02:30:00 PM",
-  "02:45:00 PM",
-  "03:00:00 PM",
-  "03:15:00 PM",
-  "03:30:00 PM",
-  "03:45:00 PM",
-  "04:00:00 PM",
-  "04:15:00 PM",
-  "04:30:00 PM",
-  "04:45:00 PM",
-  "05:00:00 PM",
-  "05:15:00 PM",
-  "05:30:00 PM",
-  "05:45:00 PM",
-  "06:00:00 PM",
-  "06:15:00 PM",
-  "06:30:00 PM",
-  "06:45:00 PM",
-  "07:00:00 PM",
-  "07:15:00 PM",
-  "07:30:00 PM",
-  "07:45:00 PM",
-  "08:00:00 PM",
-  "08:15:00 PM",
-  "08:30:00 PM",
-  "08:45:00 PM",
-  "09:00:00 PM",
-  "09:15:00 PM",
-  "09:30:00 PM",
-  "09:45:00 PM",
-  "10:00:00 PM",
-  "10:15:00 PM",
-  "10:30:00 PM",
-  "10:45:00 PM",
-  "11:00:00 PM",
-  "11:15:00 PM",
-  "11:30:00 PM",
-  "11:45:00 PM",
-];
+import { timeSlots } from "../Utils";
+import { debounce } from "lodash";
 
 const EventAllotment = () => {
   const [selectedDate, setSelectedDate] = useState("");
@@ -135,6 +38,33 @@ const EventAllotment = () => {
   const [displayEndTime, setDisplayEndTime] = useState("");
   const [eventName, setEventName] = useState("");
   const [multipleAttendees, setMultipleAttendees] = useState(false);
+  /************************************************************** */
+  const [suggestions, setSuggestions] = useState<
+    Array<{ _id: string; eventName: string }>
+  >([]);
+
+  // Debounced function to fetch suggestions from the server
+  const fetchSuggestions = debounce(async (query: string) => {
+    if (query.length > 1) {
+      try {
+        const response = await axios.get(`/attendee/eventNames?q=${query}`);
+        console.log("response of titles", response);
+        const titles = response.data.data;
+        setSuggestions(titles);
+      } catch (error) {
+        console.error("Error fetching suggestions:", error);
+      }
+    }
+  }, 300);
+
+  // Handle input change and trigger suggestions fetch
+  const handleEventNameChange = (value: string) => {
+    setSuggestions([]);
+    console.log("Value of meeting: ", value);
+
+    setEventName(value);
+    fetchSuggestions(value);
+  };
 
   const { state } = useLocation();
   console.log(state);
@@ -194,7 +124,7 @@ const EventAllotment = () => {
     // }
 
     // send this data to DB
-    
+
     const userSchedulingData = {
       username: username,
       schedule: {
@@ -333,9 +263,26 @@ const EventAllotment = () => {
             label="Meeting title"
             name="eventName"
             type="text"
-            handleInputChange={setEventName}
+            handleInputChange={handleEventNameChange}
             value={eventName}
           />
+          {/* Suggestions dropdown */}
+          {suggestions.length > 0 && (
+            <div className="absolute z-10 bg-base-200 border border-base-300 rounded-md mt-1 shadow-lg">
+              {suggestions.map((suggestion) => (
+                <div
+                  key={suggestion._id}
+                  onClick={() => {
+                    setEventName(suggestion.eventName);
+                    setSuggestions([]);
+                  }}
+                  className="px-4 py-2 cursor-pointer hover:bg-primary hover:text-white"
+                >
+                  {suggestion.eventName}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
         <div className="bg-base-200 p-4 rounded-lg col-span-full">
           <h1 className="text-2xl font-bold mb-4">Meeting Type</h1>

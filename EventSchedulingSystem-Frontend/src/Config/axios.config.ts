@@ -4,6 +4,7 @@ import axios, {
   InternalAxiosRequestConfig,
 } from "axios";
 
+// represents a pending request that needs to be retried after a token refresh
 interface QueueItem {
   resolve: (value?: unknown) => void;
   reject: (error: AxiosError) => void;
@@ -29,6 +30,7 @@ const api: AxiosInstance = axios.create({
 let isRefreshing = false;
 let failedQueue: QueueItem[] = [];
 
+// It takes all queued requests and either resolves or rejects them based on the token refresh result
 const processQueue = (error: AxiosError | null): void => {
   failedQueue.forEach((prom) => {
     if (error) {
@@ -42,13 +44,7 @@ const processQueue = (error: AxiosError | null): void => {
 
 // Add request interceptor
 api.interceptors.request.use(
-  async (config: InternalAxiosRequestConfig) => {
-    // Skip token check for refresh token requests
-    if (config.url?.includes("refresh-token")) {
-      return config;
-    }
-    return config;
-  },
+  (config: InternalAxiosRequestConfig) => config,
   (error: AxiosError) => {
     return Promise.reject(error);
   }
@@ -76,11 +72,15 @@ const shouldRetryRequest = (error: AxiosError, retryCount: number): boolean => {
 
 // Add response interceptor
 api.interceptors.response.use(
+  // Success handler - simply returns the successful response
   (response) => response,
+
+  // Error handler - handles any failed requests
   async (error: AxiosError) => {
+    // Get the original request configuration and add typing for retry properties
     const originalRequest = error.config as InternalAxiosRequestConfig & {
-      _retry?: boolean;
-      retryCount?: number;
+      _retry?: boolean; // Flag to prevent infinite retry loops
+      retryCount?: number; // Counter for number of retry attempts
     };
 
     // Initialize retryCount if it doesn't exist
@@ -88,14 +88,18 @@ api.interceptors.response.use(
       originalRequest.retryCount = 0;
     }
 
-    // Handle 401 errors and token refresh
+    // Check if this is a 401 error (unauthorized) and we haven't tried to retry yet
     if (error.response?.status === 401 && !originalRequest._retry) {
+      // Mark this request as retried to prevent infinite loops
       originalRequest._retry = true;
 
+      // Check if we're already in the process of refreshing the token
       if (!isRefreshing) {
+        // Set the refreshing flag to true to prevent multiple refresh attempts
         isRefreshing = true;
 
         try {
+          // Attempt to refresh the token
           const response = await axios.post(
             "/users/refresh-token",
             {},
@@ -105,31 +109,47 @@ api.interceptors.response.use(
           );
           console.log("interceptor response:", response);
 
+          // Reset the refreshing flag
           isRefreshing = false;
+
+          // Process any requests that were queued during the refresh
           processQueue(null);
 
-          // Retry the original request
+          // Retry the original request that triggered the refresh
           return api(originalRequest);
         } catch (refreshError) {
+          // If refresh fails, reject all queued requests
           processQueue(refreshError as AxiosError);
+
+          // Reset the refreshing flag
           isRefreshing = false;
 
-          // Redirect to login if refresh fails
+          // Redirect to login page as authentication has completely failed
           window.location.href = "/login";
+
+          // Reject the promise with the refresh error
           return Promise.reject(refreshError);
         }
       }
 
+      // If we're already refreshing, add this request to the queue
       return new Promise((resolve, reject) => {
         failedQueue.push({ resolve, reject });
       }).then(() => {
+        // Once the queue is processed, retry this request
         return api(originalRequest);
       });
     }
 
-    // Check if we should retry the request using the helper function
+    // For non-401 errors, check if we should retry the request using the helper function
     if (shouldRetryRequest(error, originalRequest.retryCount)) {
+      // Increment the retry counter
       originalRequest.retryCount += 1;
+
+      // Calculate delay using exponential backoff
+      // 1st retry: 2 seconds
+      // 2nd retry: 4 seconds
+      // 3rd retry: 8 seconds
       const retryDelay = 1000 * Math.pow(2, originalRequest.retryCount); // Exponential backoff
 
       console.error(

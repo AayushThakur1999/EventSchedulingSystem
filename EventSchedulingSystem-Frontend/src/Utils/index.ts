@@ -4,3 +4,4 @@ export { userLoader } from "./Loaders";
 export { adminLoader } from "./Loaders";
 export { loginAction } from "./Actions";
 export { registerAction } from "./Actions";
+export { timeSlots } from "./constants";
