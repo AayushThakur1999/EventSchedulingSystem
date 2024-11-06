@@ -213,7 +213,7 @@ const UserAvailability = () => {
                   </span>
                   <button
                     onClick={() => deleteAvailability(item._id as string)}
-                    className="btn btn-error btn-sm"
+                    className="btn btn-primary text-gray-100 hover:bg-red-700 btn-sm"
                   >
                     Delete
                   </button>

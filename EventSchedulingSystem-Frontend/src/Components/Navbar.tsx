@@ -168,7 +168,7 @@ const Navbar = ({
         <h2 className="text-xl font-bold mt-2">Confirm Logout</h2>
         <p>Are you sure you want to log out?</p>
         <button
-          className="btn btn-sm btn-primary mt-4 text-slate-100 border-neutral-300 hover:scale-105 hover:bg-error"
+          className="btn btn-sm btn-primary mt-4 text-slate-100 border-neutral-300 hover:scale-105 hover:bg-red-700"
           onClick={logoutUser}
         >
           Logout

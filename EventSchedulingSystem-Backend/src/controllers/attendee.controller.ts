@@ -92,6 +92,13 @@ export const addAttendee = AsyncHandler(async (req, res) => {
 export const getEventNames = AsyncHandler(async (req, res) => {
   const query = req.query.q;
   
+  /**
+   * The $match stage filters documents based on the case-insensitive search for eventName.
+   * The $group stage groups the documents by the eventName field, ensuring each event name appears only once.
+   * The $limit stage limits the results to 5 documents.
+   * The $project stage reshapes the documents to include only the eventName field in the output.
+   * This will ensure that the response contains unique event names without any repetitions.
+   */
   const similarEventNames = await Attendee.aggregate([
     {
       $match: {
