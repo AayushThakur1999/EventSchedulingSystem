@@ -5,3 +5,5 @@ export { default as Register } from "./Register";
 export { default as Admin } from "./Admin";
 export { default as UserAvailability } from "./UserAvailability";
 export { default as EventAllotment } from "./EventAllotment";
+export { default as UserSessions } from "./UserSessions";
+export { default as AllUsersSessions } from "./AllUsersSessions";

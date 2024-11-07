@@ -91,7 +91,7 @@ export const addAttendee = AsyncHandler(async (req, res) => {
 
 export const getEventNames = AsyncHandler(async (req, res) => {
   const query = req.query.q;
-  
+
   /**
    * The $match stage filters documents based on the case-insensitive search for eventName.
    * The $group stage groups the documents by the eventName field, ensuring each event name appears only once.
@@ -125,5 +125,59 @@ export const getEventNames = AsyncHandler(async (req, res) => {
     .status(200)
     .json(
       new ApiResponse(200, similarEventNames, "Successfully fetched eventNames")
+    );
+});
+
+export const getAttendeeSessions = AsyncHandler(async (req, res) => {
+  // console.log("inside getAttendeeSessions:", req.user);
+  const { username } = req.user;
+  // remove used-up/useless documents if any (step 3)
+  // const removedAvailabilities = await Attendee.deleteMany({
+  //   username,
+  // condition on which to delete previous meetingSpots like endDateAndTime: { $lt: new Date() },
+  // in Availability controller
+  // });
+  // console.log(removedAvailabilities);
+
+  const attendeeSessions = await Attendee.find({
+    username,
+  });
+
+  if (!attendeeSessions) {
+    throw new ApiError(
+      500,
+      "Something went wrong while fetching attendee's meeting list."
+    );
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        attendeeSessions,
+        "Session list fetched successfully!"
+      )
+    );
+});
+
+export const getAllAttendeeSessions = AsyncHandler(async (req, res) => {
+  const attendeeSessions = await Attendee.find({});
+
+  if (!attendeeSessions) {
+    throw new ApiError(
+      500,
+      "Something went wrong while fetching total attendee's list."
+    );
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        200,
+        attendeeSessions,
+        "Session list fetched successfully!"
+      )
     );
 });

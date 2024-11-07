@@ -58,3 +58,25 @@ export type adminLoaderData = {
   userData: UserData;
   allUsersAvailabilities: Array<UserAndAvailabilityData>;
 };
+
+export type TimeSlot = {
+  meetingStartTime: Date;
+  meetingEndTime: Date;
+};
+
+export type SessionData = {
+  _id: string;
+  username: string;
+  schedule: Record<string, TimeSlot>;
+  eventName: string;
+  multipleAttendees: boolean;
+};
+
+export type EventNameSessionDetails = {
+  _id: string;
+  username: string;
+  multipleAttendees: boolean;
+  schedule: Record<string, TimeSlot>;
+};
+
+export type EventBasedData = Record<string, EventNameSessionDetails[]>;

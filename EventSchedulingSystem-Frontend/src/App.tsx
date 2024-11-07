@@ -7,9 +7,18 @@ import {
   UserAvailability,
   Error,
   Landing,
+  UserSessions,
 } from "./Pages";
-import { adminLoader, loginAction, registerAction, userLoader } from "./Utils";
-import { registerLoader } from "./Utils/Loaders";
+import {
+  adminLoader,
+  allSessionsLoader,
+  loginAction,
+  registerAction,
+  registerLoader,
+  userLoader,
+  userSessionsLoader,
+} from "./Utils";
+import AllUsersSessions from "./Pages/AllUsersSessions";
 
 const router = createBrowserRouter([
   {
@@ -37,9 +46,21 @@ const router = createBrowserRouter([
     errorElement: <Error />,
   },
   {
+    path: "user/:id/my-sessions",
+    element: <UserSessions />,
+    loader: userSessionsLoader,
+    errorElement: <Error />,
+  },
+  {
     path: "admin/:id",
     element: <Admin />,
     loader: adminLoader,
+    errorElement: <Error />,
+  },
+  {
+    path: "admin/:id/sessions",
+    element: <AllUsersSessions />,
+    loader: allSessionsLoader,
     errorElement: <Error />,
   },
   {

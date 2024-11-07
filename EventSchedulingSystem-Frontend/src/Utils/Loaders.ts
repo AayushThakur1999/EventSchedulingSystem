@@ -1,6 +1,6 @@
 import { Params } from "react-router-dom";
 import api from "../Config/axios.config";
-import { adminLoaderData, userLoaderData } from "../Types";
+import { adminLoaderData, SessionData, userLoaderData } from "../Types";
 import { toast } from "react-toastify";
 
 export const registerLoader = async ({ params }: { params: Params }) => {
@@ -11,10 +11,13 @@ export const registerLoader = async ({ params }: { params: Params }) => {
     const user = response.data.data;
     if (user._id === params.id) {
       if (user.isAdmin) {
-        return toast.success("Authentication Successful, Welcome Admin 🦄");
+        toast.success("Authentication Successful, Welcome Admin 🦄");
+        return "User authentication was successful!";
       }
       toast.error("Only Admins have this privilege :[");
-      throw new Error("Only Admins have the authority to register new users :)");
+      throw new Error(
+        "Only Admins have the authority to register new users :)"
+      );
     }
     toast.error("Unauthorized user");
     throw new Error(`User with id:${params.id} is UNAUTHORIZED!`);
@@ -77,6 +80,42 @@ export const adminLoader = async ({ params }: { params: Params }) => {
       throw new Error(error.message);
     } else {
       throw new Error("Something went wrong while fetching user");
+    }
+  }
+};
+
+export const userSessionsLoader = async () => {
+  try {
+    const response = await api.get("/attendee/get-mySessions");
+    console.log("sessions data response", response);
+    // data.userData = user;
+    const mySessions: Array<SessionData> = response.data.data;
+    // data.mySessions = mySessions;
+    return mySessions;
+  } catch (error) {
+    console.log(error);
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("Something went wrong while fetching sessions info");
+    }
+  }
+};
+
+export const allSessionsLoader = async () => {
+  try {
+    const response = await api.get("/attendee/get-AllSessions");
+    console.log("all sessions data response", response);
+    // data.userData = user;
+    const allSessions: Array<SessionData> = response.data.data;
+    // data.mySessions = mySessions;
+    return allSessions;
+  } catch (error) {
+    console.log(error);
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("Something went wrong while fetching all sessions info");
     }
   }
 };

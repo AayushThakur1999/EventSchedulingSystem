@@ -5,9 +5,7 @@ import {
   TimeObject,
   UserNameAndDateBasedUsersData,
 } from "../Types";
-import { convertTo24HourFormat } from "../Utils";
-import axios from "axios";
-import { toast } from "react-toastify";
+import { convertTo24HourFormat, logoutUser } from "../Utils";
 import { Navbar } from "../Components";
 
 const Admin = () => {
@@ -147,17 +145,6 @@ const Admin = () => {
 
   const navigate = useNavigate();
 
-  const logoutUser = async () => {
-    try {
-      const response = await axios.post("/users/logout", {});
-      console.log(response);
-      toast(response.data?.message || "You have Logged-Out Successfully :)");
-      navigate("/login");
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-base-200 to-base-300 text-base-content">
       {/* <div className="container mx-auto px-4 py-12">
@@ -220,15 +207,16 @@ const Admin = () => {
       <div className="max-w-5xl mx-auto pt-8 grid grid-cols-1 gap-6 bg-transparent">
         <Navbar
           name={userData.fullname}
-          logoutUser={logoutUser}
+          logoutUser={() => logoutUser(navigate)}
           isAdmin={userData.isAdmin}
         />
       </div>
       <section className="container mx-auto px-4 pb-12 pt-6">
         <div className="flex justify-end mb-8">
           <Link
-            to="/sessions"
+            to="sessions"
             className="btn btn-outline btn-accent btn-md hover:!text-white"
+            state={userData}
           >
             Upcoming Sessions
           </Link>
