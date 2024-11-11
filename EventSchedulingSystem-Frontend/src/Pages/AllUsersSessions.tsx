@@ -151,12 +151,19 @@ const AllUsersSessions = () => {
               className="collapse collapse-arrow border border-base-300 bg-base-100 rounded-box"
             >
               <input type="checkbox" />
-              <div className="collapse-title text-lg font-medium">
-                <span className="badge badge-primary capitalize badge-lg mr-2">
+              <div className="collapse-title text-lg font-medium max-sm:flex max-sm:flex-col max-sm:justify-center">
+                <span className="bg-accent text-slate-100 rounded-2xl px-3 py-2 capitalize mr-2">
                   {event}
                 </span>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-gray-500 max-sm:ml-2">
                   {eventBasedData[event].length} attendees
+                </span>
+                <span
+                  className={`ml-2 badge ${eventBasedData[event][0].multipleAttendees ? "badge-success" : "badge-error"} badge-outline`}
+                >
+                  {eventBasedData[event][0].multipleAttendees
+                    ? "Multiple Attendees"
+                    : "Single Attendee Only"}
                 </span>
               </div>
               <div className="collapse-content">

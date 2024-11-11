@@ -49,8 +49,16 @@ export const addAttendee = AsyncHandler(async (req, res) => {
   // console.log("sTime::", sTime);
   // console.log("eTime::", eTime);
 
+  // checks and throws error if we are trying to add multiple attendees when they shouldn't be there
+  const eventExists = await Attendee.findOne({ eventName });
+
+  if (eventExists && eventExists.multipleAttendees === false) {
+    throw new ApiError(409, "This event doesn not allow multiple attendees!");
+  }
+
   const duplicateAttendee = await Attendee.findOne({
     $and: [
+      { username },
       { [`schedule.${scheduledDate}`]: { $exists: true } },
       { [`schedule.${scheduledDate}.meetingStartTime`]: { $lt: eTime } },
       { [`schedule.${scheduledDate}.meetingEndTime`]: { $gt: sTime } },
@@ -132,12 +140,10 @@ export const getAttendeeSessions = AsyncHandler(async (req, res) => {
   // console.log("inside getAttendeeSessions:", req.user);
   const { username } = req.user;
   // remove used-up/useless documents if any (step 3)
-  // const removedAvailabilities = await Attendee.deleteMany({
-  //   username,
-  // condition on which to delete previous meetingSpots like endDateAndTime: { $lt: new Date() },
-  // in Availability controller
-  // });
-  // console.log(removedAvailabilities);
+  const removedAvailabilities = await Attendee.deleteMany({
+    // mongodb query to remove passed events
+  });
+  console.log("less than today's date", removedAvailabilities);
 
   const attendeeSessions = await Attendee.find({
     username,

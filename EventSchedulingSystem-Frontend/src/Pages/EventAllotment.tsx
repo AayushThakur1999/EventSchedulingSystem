@@ -157,7 +157,7 @@ const EventAllotment = () => {
         }
         if (error.status === 409) {
           toast.error(
-            "Either the time is occupied for another event or you have provided it incorrectly!"
+            "Either something's wrong with time provided or multiple attendees not allowed for this session!"
           );
           throw new Error(error.message);
         }

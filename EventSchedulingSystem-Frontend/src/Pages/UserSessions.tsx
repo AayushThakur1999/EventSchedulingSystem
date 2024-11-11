@@ -50,6 +50,13 @@ const UserSessions = () => {
                     <span className="text-xs">to</span>
                     <span className="font-medium text-sm">{endTime}</span>
                   </div>
+                  <span
+                    className={`badge ${session.multipleAttendees ? "badge-success" : "badge-error"} badge-outline`}
+                  >
+                    {session.multipleAttendees
+                      ? "Multiple Attendees"
+                      : "Single Attendee"}
+                  </span>
                 </div>
               </div>
             );
