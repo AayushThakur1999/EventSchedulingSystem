@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { Attendee } from "../models/attendee.model";
 import { ApiError, ApiResponse, AsyncHandler } from "../utils";
 
@@ -138,7 +139,7 @@ export const getEventNames = AsyncHandler(async (req, res) => {
 
 export const getAttendeeSessions = AsyncHandler(async (req, res) => {
   const { username } = req.user;
-  
+
   // remove any attendee document where meeting End time is less than
   // the current time as it is useless at the current point in time
   const removedAvailabilities = await Attendee.deleteMany({
@@ -199,5 +200,26 @@ export const getAllAttendeeSessions = AsyncHandler(async (req, res) => {
         attendeeSessions,
         "Session list fetched successfully!"
       )
+    );
+});
+
+export const removeAttendee = AsyncHandler(async (req, res) => {
+  const { attendeeId } = req.params;
+  console.log("attendeeId", attendeeId);
+
+  if (!mongoose.isObjectIdOrHexString(attendeeId)) {
+    throw new ApiError(400, "Invalid attendee ID!");
+  }
+
+  const removedAttendee = await Attendee.deleteOne({ _id: attendeeId });
+
+  if (removedAttendee.deletedCount === 0) {
+    throw new ApiError(400, "No attendee with such id exists!");
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, removedAttendee, "attendee deleted successfully")
     );
 });

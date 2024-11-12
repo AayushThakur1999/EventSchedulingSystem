@@ -5,6 +5,7 @@ import {
   getEventNames,
   getAttendeeSessions,
   getAllAttendeeSessions,
+  removeAttendee,
 } from "../controllers/attendee.controller";
 
 const router = Router();
@@ -15,5 +16,6 @@ router.route("/add-attendee").post(addAttendee);
 router.route("/eventNames").get(getEventNames);
 router.route("/get-mySessions").get(getAttendeeSessions);
 router.route("/get-AllSessions").get(getAllAttendeeSessions);
+router.route("/removeAttendee/:attendeeId").delete(removeAttendee);
 
 export default router;

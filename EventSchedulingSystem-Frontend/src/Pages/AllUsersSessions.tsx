@@ -105,10 +105,18 @@
 // };
 // export default AllUsersSessions;
 
-import { useLoaderData, useLocation, useNavigate } from "react-router-dom";
+import {
+  useLoaderData,
+  useLocation,
+  useNavigate,
+  useRevalidator,
+} from "react-router-dom";
 import { EventBasedData, SessionData } from "../Types";
-import { Navbar } from "../Components";
+import { Modal, Navbar } from "../Components";
 import { logoutUser } from "../Utils";
+import { useState } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const AllUsersSessions = () => {
   const { state } = useLocation();
@@ -132,6 +140,28 @@ const AllUsersSessions = () => {
     return acc;
   }, {} as EventBasedData);
   console.log("eventBasedData:::", eventBasedData);
+
+  const [modalContent, setModalContent] = useState<string | null>(null);
+  const handleAttendeeRemoval = () => setModalContent("Remove Attendee");
+  const closeModal = () => setModalContent(null);
+
+  const revalidator = useRevalidator();
+
+  const removeAttendee = async (attendeeId: string) => {
+    try {
+      const response = await axios.delete(
+        `/attendee/removeAttendee/${attendeeId}`
+      );
+      console.log("attendee removal response:", response);
+      toast.success("Attendee removed from the meeting!");
+      closeModal();
+      revalidator.revalidate(); // Manually re-run the loader
+    } catch (error) {
+      console.log(error);
+      toast.error("Some error occured while trying to remove attendee :(");
+      throw new Error("Some error while trying to remove attendee :(");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-base-200">
@@ -196,10 +226,34 @@ const AllUsersSessions = () => {
                                 {startTime} - {endTime}
                               </span>
                             </div>
+                            <button
+                              className="btn btn-sm bg-red-400 mt-2 hover:bg-red-700 text-white"
+                              onClick={handleAttendeeRemoval}
+                            >
+                              Remove Attendee
+                            </button>
                           </div>
                         );
                       })}
                     </div>
+                    <Modal
+                      isOpen={modalContent === "Remove Attendee"}
+                      onClose={closeModal}
+                    >
+                      <h2 className="text-xl font-bold mt-2">
+                        Confirm Attendee Removal
+                      </h2>
+                      <p>
+                        Are you sure you want to remove the attendee from this
+                        meeting?
+                      </p>
+                      <button
+                        className="btn btn-sm btn-primary mt-4 text-slate-100 border-neutral-300 hover:scale-105 hover:bg-red-700"
+                        onClick={() => removeAttendee(attendeeData._id)}
+                      >
+                        Remove Attendee
+                      </button>
+                    </Modal>
                   </div>
                 ))}
               </div>
