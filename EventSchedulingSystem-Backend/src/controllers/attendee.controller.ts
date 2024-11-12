@@ -137,13 +137,27 @@ export const getEventNames = AsyncHandler(async (req, res) => {
 });
 
 export const getAttendeeSessions = AsyncHandler(async (req, res) => {
-  // console.log("inside getAttendeeSessions:", req.user);
   const { username } = req.user;
-  // remove used-up/useless documents if any (step 3)
+  
+  // remove any attendee document where meeting End time is less than
+  // the current time as it is useless at the current point in time
   const removedAvailabilities = await Attendee.deleteMany({
-    // mongodb query to remove passed events
+    username,
+    $expr: {
+      $lt: [
+        {
+          $min: {
+            $map: {
+              input: { $objectToArray: "$schedule" },
+              as: "sched",
+              in: "$$sched.v.meetingEndTime",
+            },
+          },
+        },
+        new Date(),
+      ],
+    },
   });
-  console.log("less than today's date", removedAvailabilities);
 
   const attendeeSessions = await Attendee.find({
     username,
