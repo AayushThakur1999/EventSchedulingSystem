@@ -205,7 +205,7 @@ export const getAllAttendeeSessions = AsyncHandler(async (req, res) => {
 
 export const removeAttendee = AsyncHandler(async (req, res) => {
   const { attendeeId } = req.params;
-  console.log("attendeeId", attendeeId);
+  // console.log("attendeeId", attendeeId);
 
   if (!mongoose.isObjectIdOrHexString(attendeeId)) {
     throw new ApiError(400, "Invalid attendee ID!");

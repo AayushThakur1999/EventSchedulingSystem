@@ -1,4 +1,4 @@
-import { Form, Link } from "react-router-dom";
+import { Form } from "react-router-dom";
 import { FormInput, SubmitBtn } from "../Components";
 import { useState } from "react";
 
@@ -35,12 +35,6 @@ const Login = () => {
         <div className="mt-4">
           <SubmitBtn text="login" />
         </div>
-        <p className="text-center">
-          Not registered yet?
-          <Link to="/register" className="ml-2 link link-hover link-primary">
-            Register
-          </Link>
-        </p>
       </Form>
     </section>
   );

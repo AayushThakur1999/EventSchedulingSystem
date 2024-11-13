@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { redirect } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -25,9 +25,15 @@ export const loginAction = async ({ request }: { request: Request }) => {
     }
   } catch (error) {
     console.error("Error::", error);
-    if (error instanceof Error) {
+    if (error instanceof AxiosError) {
+      if (error.status === 401) {
+        toast.error("Incorrect credentials!");
+        throw new Error(error.message);
+      }
+    } else if (error instanceof Error) {
       throw new Error(error.message);
     }
+    throw new Error("Something went wrong while registering the user");
   }
 };
 
@@ -46,10 +52,10 @@ export const registerAction = async ({ request }: { request: Request }) => {
     return redirect("/login");
   } catch (error) {
     console.error("ERROR:--", error);
-      if (error instanceof Error) {
-        throw new Error(error.message);
-      } else {
-        throw new Error("Something went wrong while registering the user");
-      }
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error("Something went wrong while registering the user");
+    }
   }
 };
