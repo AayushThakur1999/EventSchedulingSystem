@@ -6,7 +6,12 @@ import "react-datepicker/dist/react-datepicker.css";
 
 import { AvailabilityProps, userLoaderData } from "../Types";
 import { nanoid } from "nanoid";
-import { Link, useLoaderData, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useLoaderData,
+  useNavigate,
+  useNavigation,
+} from "react-router-dom";
 import { toast } from "react-toastify";
 import { Navbar } from "../Components";
 import { dateOptions, logoutUser } from "../Utils";
@@ -138,6 +143,11 @@ const UserAvailability = () => {
     });
   };
 
+  const navigation = useNavigation();
+
+  // Check if navigation is in progress
+  const isLoading = navigation.state === "loading";
+  
   return (
     <div className="max-w-5xl mx-auto py-8 grid grid-cols-1 gap-6">
       <Navbar
@@ -155,8 +165,18 @@ const UserAvailability = () => {
             to="my-sessions"
             className="btn btn-outline btn-accent hover:!text-white"
             state={userData}
+            onClick={(e) => {
+              if (isLoading) e.preventDefault(); // Prevent navigation
+            }}
           >
-            Upcoming Sessions
+            {isLoading ? (
+              <>
+                <span className="loading loading-ring loading-md"></span>
+                Loading...
+              </>
+            ) : (
+              "Upcoming Sessions"
+            )}
           </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -1,4 +1,9 @@
-import { Link, useLoaderData, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useLoaderData,
+  useNavigate,
+  useNavigation,
+} from "react-router-dom";
 // import { users } from "../../userData";
 import {
   adminLoaderData,
@@ -43,6 +48,49 @@ const Admin = () => {
     userData,
     allUsersAvailabilities
   );
+
+  const navigate = useNavigate();
+
+  const navigation = useNavigation();
+
+  // Check if navigation is in progress
+  const isLoading = navigation.state === "loading";
+
+  if (allUsersAvailabilities.length === 0) {
+    return (
+      <div className="max-w-5xl mx-auto pt-8 grid grid-cols-1 gap-6 bg-transparent">
+        <Navbar
+          name={userData.fullname}
+          logoutUser={() => logoutUser(navigate)}
+          isAdmin={userData.isAdmin}
+        />
+        <section className="container mx-auto px-4 pb-12 pt-6">
+          <div className="flex justify-end mb-8">
+            <Link
+              to="sessions"
+              className="btn btn-outline btn-accent btn-md hover:!text-white"
+              state={userData}
+              onClick={(e) => {
+                if (isLoading) e.preventDefault(); // Prevent navigation
+              }}
+            >
+              {isLoading ? (
+                <>
+                  <span className="loading loading-ring loading-md"></span>
+                  Loading...
+                </>
+              ) : (
+                "Upcoming Sessions"
+              )}
+            </Link>
+          </div>
+        </section>
+        <h1 className="text-3xl font-semibold text-center font-mono">
+          There are no user availabilities at the moment
+        </h1>
+      </div>
+    );
+  }
 
   const userNameAndDateBasedUsersData = allUsersAvailabilities.reduce(
     (acc: UserNameAndDateBasedUsersData, user) => {
@@ -143,8 +191,6 @@ const Admin = () => {
   );
   console.log("SORTED DATA:", sortedData);
 
-  const navigate = useNavigate();
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-base-200 to-base-300 text-base-content">
       {/* <div className="container mx-auto px-4 py-12">
@@ -217,8 +263,18 @@ const Admin = () => {
             to="sessions"
             className="btn btn-outline btn-accent btn-md hover:!text-white"
             state={userData}
+            onClick={(e) => {
+              if (isLoading) e.preventDefault(); // Prevent navigation
+            }}
           >
-            Upcoming Sessions
+            {isLoading ? (
+              <>
+                <span className="loading loading-ring loading-md"></span>
+                Loading...
+              </>
+            ) : (
+              "Upcoming Sessions"
+            )}
           </Link>
         </div>
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

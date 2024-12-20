@@ -159,6 +159,11 @@ export const deleteUserAvailability = AsyncHandler(async (req, res) => {
 });
 
 export const getAllUserAvailabilities = AsyncHandler(async (req, res) => {
+  // remove used-up/useless documents if any
+  await Availability.deleteMany({
+    endDateAndTime: { $lt: new Date() },
+  });
+  
   const allAvailabilities = await Availability.find()
     .populate({
       path: "userId",
@@ -166,8 +171,9 @@ export const getAllUserAvailabilities = AsyncHandler(async (req, res) => {
     })
     .select("userId startDateAndTime endDateAndTime"); // Select specific fields from Availability
   // console.log("AllAvailabilities", allAvailabilities);
+  // console.log("AllAvailabilities length", allAvailabilities.length);
 
-  if (!allAvailabilities || !allAvailabilities.length) {
+  if (!allAvailabilities) {
     throw new ApiError(
       500,
       "Some error occurred while trying to get all user's availability"

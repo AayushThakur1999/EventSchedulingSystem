@@ -163,6 +163,8 @@ export const getAttendeeSessions = AsyncHandler(async (req, res) => {
   const attendeeSessions = await Attendee.find({
     username,
   });
+  console.log("attendee Sessions:", attendeeSessions);
+  
 
   if (!attendeeSessions) {
     throw new ApiError(
@@ -183,6 +185,152 @@ export const getAttendeeSessions = AsyncHandler(async (req, res) => {
 });
 
 export const getAllAttendeeSessions = AsyncHandler(async (req, res) => {
+  const currentDate = new Date();
+
+  // Set current time to ignore time zone differences during comparison
+  const currentTime = new Date(currentDate.setMilliseconds(0));
+
+  const sessionsToDelete = await Attendee.aggregate([
+    {
+      $match: {
+        schedule: { $exists: true, $not: { $size: 0 } },
+      },
+    },
+    {
+      $addFields: {
+        scheduleArray: { $objectToArray: "$schedule" }, // Convert `schedule` to array of { k, v }
+      },
+    },
+    {
+      $addFields: {
+        filteredSchedule: {
+          $filter: {
+            input: "$scheduleArray", // Input: Array of { k, v }
+            as: "item", // Variable for each array element
+            cond: {
+              $or: [
+                {
+                  // Check if the date part of meetingEndTime is equal to current date
+                  $and: [
+                    {
+                      $eq: [
+                        {
+                          $dateToString: { format: "%m/%d/%Y", date: "$$item.v.meetingEndTime" }
+                        },
+                        {
+                          $dateToString: { format: "%m/%d/%Y", date: currentDate }
+                        }
+                      ]
+                    },
+                    {
+                      // Check if meetingEndTime is less than current time
+                      $lt: [
+                        "$$item.v.meetingEndTime", currentTime
+                      ]
+                    }
+                  ]
+                },
+                {
+                  // Check if the date key (schedule key) is less than the current date
+                  $lt: [
+                    {
+                      $dateFromString: {
+                        dateString: "$$item.k", // The schedule key (date)
+                        format: "%m/%d/%Y"
+                      }
+                    },
+                    {
+                      $dateFromString: {
+                        dateString: {
+                          $dateToString: { format: "%m/%d/%Y", date: currentDate }
+                        },
+                        format: "%m/%d/%Y"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          },
+        },
+      },
+    },
+    {
+      $match: {
+        "filteredSchedule.0": { $exists: true }, // Only keep documents with non-empty filteredSchedule
+      },
+    },
+    {
+      $project: {
+        scheduleArray: 0, // Exclude intermediate fields from the result
+        filteredSchedule: 0,
+      },
+    },
+  ]);
+
+  // const sessionsToDelete = await Attendee.aggregate([
+  //   {
+  //     $match: {
+  //       schedule: { $exists: true, $not: { $size: 0 } },
+  //     },
+  //   },
+  //   {
+  //     $addFields: {
+  //       scheduleArray: { $objectToArray: "$schedule" }, // Convert `schedule` to array of { k, v }
+  //     },
+  //   },
+  //   {
+  //     $addFields: {
+  //       pastSchedule: {
+  //         $filter: {
+  //           input: "$scheduleArray", // Input: Array of { k, v }
+  //           as: "item", // Variable for each array element
+  //           cond: {
+  //             $lt: [
+  //               {
+  //                 $dateFromString: {
+  //                   dateString: "$$item.k",
+  //                   format: "%m/%d/%Y", // Ensure comparison is only on the date part
+  //                 },
+  //               }, // Convert key (date string) to Date
+  //               {
+  //                 // Strip the time from currentDate by resetting it to midnight
+  //                 $dateFromString: {
+  //                   dateString: {
+  //                     $dateToString: { format: "%m/%d/%Y", date: currentDate },
+  //                   },
+  //                   format: "%m/%d/%Y", // Format as MM/DD/YYYY to strip time
+  //                 },
+  //               }, // Compare with current date
+  //             ],
+  //           },
+  //         },
+  //       },
+  //     },
+  //   },
+  //   {
+  //     $match: {
+  //       "pastSchedule.0": { $exists: true }, // Only keep documents with non-empty pastSchedule
+  //     },
+  //   },
+  //   {
+  //     $project: {
+  //       scheduleArray: 0, // Exclude intermediate fields from the result
+  //       pastSchedule: 0,
+  //     },
+  //   },
+  // ]);
+
+  console.log(
+    "filtered documents which needs to be deleted::",
+    sessionsToDelete.length
+  );
+
+  const idsToDelete = sessionsToDelete.map((session) => session._id);
+
+  // deleting expired sessions
+  await Attendee.deleteMany({ _id: { $in: idsToDelete } });
+
   const attendeeSessions = await Attendee.find({});
 
   if (!attendeeSessions) {
