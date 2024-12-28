@@ -289,6 +289,7 @@ const Admin = () => {
                   state={{
                     userDates: userNameAndDateBasedUsersData[user],
                     username: user,
+                    userData,
                   }}
                   className="card-title text-2xl text-primary hover:text-secondary transition-colors duration-200"
                 >

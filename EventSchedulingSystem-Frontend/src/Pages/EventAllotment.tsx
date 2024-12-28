@@ -21,7 +21,7 @@
 
 import { useState } from "react";
 import { Calendar, Clock } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { TimeObject } from "../Types";
 import { FormInput } from "../Components";
 import { convertTo24HourFormat } from "../Utils";
@@ -68,7 +68,7 @@ const EventAllotment = () => {
 
   const { state } = useLocation();
   console.log(state);
-  const { userDates, username } = state;
+  const { userDates, username, userData } = state;
   console.log(userDates);
   //   {
   //     "9/5/2024": [
@@ -128,10 +128,8 @@ const EventAllotment = () => {
     const userSchedulingData = {
       username: username,
       schedule: {
-        [selectedDate]: {
-          meetingStartTime: new Date(`${selectedDate} ${meetingStartTime}`),
-          meetingEndTime: new Date(`${selectedDate} ${meetingEndTime}`),
-        },
+        meetingStartTime: new Date(`${selectedDate} ${meetingStartTime}`),
+        meetingEndTime: new Date(`${selectedDate} ${meetingEndTime}`),
       },
       eventName,
       multipleAttendees,
@@ -169,7 +167,21 @@ const EventAllotment = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Schedule a Meeting</h1>
+      <h1 className="text-3xl font-bold my-8 text-center">
+        Schedule a Meeting
+      </h1>
+      <div className="flex justify-between mt-4 mb-8">
+        <Link to={`/admin/${userData._id}`}>
+          <button className="btn btn-outline btn-primary hover:!text-white">
+            Back to Admin Dashboard
+          </button>
+        </Link>
+        <Link to={`/admin/${userData._id}/sessions`} state={userData}>
+          <button className="btn btn-outline btn-accent hover:!text-white">
+            Upcoming Sessions
+          </button>
+        </Link>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-base-200 p-4 rounded-lg">
@@ -299,7 +311,7 @@ const EventAllotment = () => {
       <div className="mt-4">
         <button
           onClick={handleSchedule}
-          className="btn btn-primary"
+          className="btn btn-outline hover:!text-white btn-primary"
           disabled={
             !selectedDate || !meetingStartTime || !meetingEndTime || !eventName
           }

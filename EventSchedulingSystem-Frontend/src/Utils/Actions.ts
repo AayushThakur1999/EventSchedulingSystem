@@ -30,6 +30,12 @@ export const loginAction = async ({ request }: { request: Request }) => {
         toast.error("Incorrect credentials!");
         throw new Error(error.message);
       }
+      if (error.status === 404) {
+        toast.error("No such user was found!");
+        throw new Error(
+          "User with these specific credentials does not exist!!"
+        );
+      }
     } else if (error instanceof Error) {
       throw new Error(error.message);
     }

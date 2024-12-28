@@ -22,8 +22,7 @@ const attendeeSchema = new Schema<IAttendee, AttendeeModel, IAttendeeMethods>(
       required: true,
     },
     schedule: {
-      type: Map,
-      of: timeSlotSchema, // Each date will map to a timeslot object
+      type: timeSlotSchema,
       required: true,
     },
     eventName: {

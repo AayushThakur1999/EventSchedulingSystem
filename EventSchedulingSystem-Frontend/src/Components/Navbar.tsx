@@ -180,7 +180,7 @@ const Navbar = ({
           <h2 className="text-xl font-bold mt-2">New Registration</h2>
           <p>Do you want to register a new user?</p>
           <button
-            className="btn btn-sm btn-primary mt-4 text-slate-100 border-neutral-300 hover:scale-105 hover:bg-error"
+            className="btn btn-sm btn-primary mt-4 text-slate-100 border-neutral-300 hover:scale-105 hover:bg-lime-500"
             onClick={() => navigate("register")}
           >
             Go to Registeration Page

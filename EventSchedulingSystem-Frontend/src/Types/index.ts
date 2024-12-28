@@ -67,7 +67,7 @@ export type TimeSlot = {
 export type SessionData = {
   _id: string;
   username: string;
-  schedule: Record<string, TimeSlot>;
+  schedule: TimeSlot;
   eventName: string;
   multipleAttendees: boolean;
 };
@@ -76,7 +76,7 @@ export type EventNameSessionDetails = {
   _id: string;
   username: string;
   multipleAttendees: boolean;
-  schedule: Record<string, TimeSlot>;
+  schedule: TimeSlot;
 };
 
 export type EventBasedData = Record<string, EventNameSessionDetails[]>;

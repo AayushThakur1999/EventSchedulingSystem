@@ -40,6 +40,13 @@ const router = createBrowserRouter([
     errorElement: <Error />,
   },
   {
+    path: "/admin/:id/sessions/register",
+    element: <Register />,
+    loader: registerLoader,
+    action: registerAction,
+    errorElement: <Error />,
+  },
+  {
     path: "user/:id",
     element: <UserAvailability />,
     loader: userLoader,

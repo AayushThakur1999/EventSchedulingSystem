@@ -31,7 +31,7 @@ export type TimeSlot = {
 
 export interface IAttendee extends Document<Types.ObjectId> {
   username: string;
-  schedule: Record<string, TimeSlot>;
+  schedule: TimeSlot;
   eventName: string;
   multipleAttendees: boolean;
 }

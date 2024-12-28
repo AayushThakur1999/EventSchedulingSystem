@@ -1,11 +1,16 @@
-import { useLoaderData, useLocation, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useLoaderData,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { Navbar } from "../Components";
 import { logoutUser } from "../Utils";
 import { SessionData } from "../Types";
 
 const UserSessions = () => {
   const { state } = useLocation();
-  // console.log("state recieved:", state);
+  console.log("state recieved:", state);
 
   const mySessions = useLoaderData() as SessionData[];
   console.log("My sessions:", mySessions);
@@ -20,6 +25,14 @@ const UserSessions = () => {
           logoutUser={() => logoutUser(navigate)}
           isAdmin={false}
         />
+        <div className="flex justify-center">
+          <Link
+            to={`/user/${state._id}`}
+            className="btn btn-outline hover:!text-white btn-primary hover:bg-primary-400 text-white"
+          >
+            Go back to User Dashboard
+          </Link>
+        </div>
       </div>
       <section className="container mx-auto px-4 pb-12 pt-6">
         {mySessions.length < 1 ? (
@@ -29,12 +42,9 @@ const UserSessions = () => {
         ) : (
           <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {mySessions.map((session) => {
-              const singleDateArray = Object.keys(session.schedule);
-              const fullDate = new Date(singleDateArray[0]).toDateString();
+              const { meetingStartTime, meetingEndTime } = session.schedule;
+              const fullDate = new Date(meetingStartTime).toDateString();
               // console.log("fullDate", fullDate);
-
-              const { meetingStartTime, meetingEndTime } =
-                session.schedule[singleDateArray[0]];
               const startTime = new Date(meetingStartTime).toLocaleTimeString();
               const endTime = new Date(meetingEndTime).toLocaleTimeString();
 
