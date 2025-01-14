@@ -13,4 +13,13 @@ export default defineConfig({
     },
   },
   plugins: [react()],
+  build: {
+    modulePreload: true,
+    target: "esnext",
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
+  },
 });
