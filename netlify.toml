@@ -4,8 +4,20 @@
 
 # Used during production to redirect API requests from the Netlify domain to your backend on Render
 [[redirects]]
-  from = "/api/v1/*"
-  to = "https://eventschedulingsystem.onrender.com/api/v1/:splat"
+  from = "/users/*"
+  to = "https://eventschedulingsystem.onrender.com/api/v1/users/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/availability/*"
+  to = "https://eventschedulingsystem.onrender.com/api/v1/availability/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/attendee/*"
+  to = "https://eventschedulingsystem.onrender.com/api/v1/attendee/:splat"
   status = 200
   force = true
 
