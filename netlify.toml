@@ -10,6 +10,12 @@
   force = true
 
 [[redirects]]
+  from = "/api/v1/*"
+  to = "https://eventschedulingsystem.onrender.com/api/v1/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/availability/*"
   to = "https://eventschedulingsystem.onrender.com/api/v1/availability/:splat"
   status = 200
