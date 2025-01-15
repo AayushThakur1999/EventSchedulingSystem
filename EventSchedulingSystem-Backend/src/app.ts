@@ -45,9 +45,9 @@ app.use(express.static("public"));
 app.use(cookieParser());
 
 // routes import
-import userRouter from "./routes/user.routes";
-import availabilityRouter from "./routes/availability.routes";
-import attendeeRouter from "./routes/attendee.routes";
+import userRouter from "./routes/user.routes.js";
+import availabilityRouter from "./routes/availability.routes.js";
+import attendeeRouter from "./routes/attendee.routes.js";
 
 // routes declaration
 app.use("/api/v1/users", userRouter);

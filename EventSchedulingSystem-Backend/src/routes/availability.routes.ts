@@ -4,8 +4,8 @@ import {
   deleteUserAvailability,
   getAllUserAvailabilities,
   getUserAvailabilities,
-} from "../controllers/availability.controller";
-import { verifyJWT } from "../middlewares/auth.middleware";
+} from "../controllers/availability.controller.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 

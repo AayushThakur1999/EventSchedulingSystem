@@ -1,6 +1,6 @@
-import { User } from "../models/user.model";
-import { TokensJwtPayload } from "../types";
-import { ApiError, AsyncHandler } from "../utils";
+import { User } from "../models/user.model.js";
+import { TokensJwtPayload } from "../types/index.js";
+import { ApiError, AsyncHandler } from "../utils/index.js";
 import jwt from "jsonwebtoken";
 
 // We can use _ in place of res since we are not using res in this function

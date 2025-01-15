@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
-import { cookieOptions } from "../constants";
-import { User } from "../models/user.model";
-import { LoginRequestBody, TokensJwtPayload } from "../types";
+import { cookieOptions } from "../constants.js";
+import { User } from "../models/user.model.js";
+import { LoginRequestBody, TokensJwtPayload } from "../types/index.js";
 import {
   ApiError,
   AsyncHandler,
   generateAccessAndRefreshTokens,
   ApiResponse,
-} from "../utils";
+} from "../utils/index.js";
 import jwt from "jsonwebtoken";
 
 export const registerUser = AsyncHandler(async (req, res) => {

@@ -1,10 +1,10 @@
 import { Schema, model } from "mongoose";
-import { User } from "./user.model";
+import { User } from "./user.model.js";
 import {
   AvailabilityModel,
   IAvailability,
   IAvailabilityMethods,
-} from "../types";
+} from "../types/index.js";
 
 const availabilitySchema = new Schema<
   IAvailability,

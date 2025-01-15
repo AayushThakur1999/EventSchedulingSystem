@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { Availability } from "../models/availability.model";
-import { ApiError, ApiResponse, AsyncHandler } from "../utils";
+import { Availability } from "../models/availability.model.js";
+import { ApiError, ApiResponse, AsyncHandler } from "../utils/index.js";
 
 export const addAvailability = AsyncHandler(async (req, res) => {
   // get availability data from user, passed in req.body

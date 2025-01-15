@@ -1,5 +1,5 @@
 import { Schema, model } from "mongoose";
-import { AttendeeModel, IAttendee, IAttendeeMethods, TimeSlot } from "../types";
+import { AttendeeModel, IAttendee, IAttendeeMethods, TimeSlot } from "../types/index.js";
 
 const timeSlotSchema = new Schema<TimeSlot>(
   {

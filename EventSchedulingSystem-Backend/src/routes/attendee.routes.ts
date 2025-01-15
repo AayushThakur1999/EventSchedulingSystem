@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { verifyJWT } from "../middlewares/auth.middleware";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 import {
   addAttendee,
   getEventNames,
   getAttendeeSessions,
   getAllAttendeeSessions,
   removeAttendee,
-} from "../controllers/attendee.controller";
+} from "../controllers/attendee.controller.js";
 
 const router = Router();
 

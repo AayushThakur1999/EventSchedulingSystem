@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { Attendee } from "../models/attendee.model";
-import { ApiError, ApiResponse, AsyncHandler } from "../utils";
+import { Attendee } from "../models/attendee.model.js";
+import { ApiError, ApiResponse, AsyncHandler } from "../utils/index.js";
 
 export const addAttendee = AsyncHandler(async (req, res) => {
   const { username, schedule, eventName } = req.body;
