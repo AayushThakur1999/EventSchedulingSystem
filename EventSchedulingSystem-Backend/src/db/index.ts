@@ -19,7 +19,7 @@
 // export default connectDB;
 
 import mongoose from "mongoose";
-import { DB_NAME } from "../constants";
+import { DB_NAME } from "../constants.js";
 import { log } from "console";
 
 const connectDB = async () => {
