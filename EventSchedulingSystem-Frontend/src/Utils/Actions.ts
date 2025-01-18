@@ -1,6 +1,7 @@
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import { redirect } from "react-router-dom";
 import { toast } from "react-toastify";
+import api from "../Config/axios.config";
 
 export const loginAction = async ({ request }: { request: Request }) => {
   const formData = await request.formData();
@@ -10,7 +11,7 @@ export const loginAction = async ({ request }: { request: Request }) => {
   const loginData = { ...data, isAdmin };
   console.log(loginData);
   try {
-    const response = await axios.post("/users/login", loginData, {
+    const response = await api.post("/users/login", loginData, {
       headers: {
         "Content-Type": "application/json",
       },
@@ -48,7 +49,7 @@ export const registerAction = async ({ request }: { request: Request }) => {
   const data = Object.fromEntries(formData);
   console.log(data);
   try {
-    const response = await axios.post("/users/register", data, {
+    const response = await api.post("/users/register", data, {
       headers: {
         "Content-Type": "application/json",
       },
