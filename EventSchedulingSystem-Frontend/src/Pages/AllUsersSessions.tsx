@@ -116,8 +116,8 @@ import { EventBasedData, SessionData } from "../Types";
 import { Modal, Navbar } from "../Components";
 import { logoutUser } from "../Utils";
 import { useState } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
+import api from "../Config/axios.config";
 
 const AllUsersSessions = () => {
   const { state } = useLocation();
@@ -150,7 +150,7 @@ const AllUsersSessions = () => {
 
   const removeAttendee = async (attendeeId: string) => {
     try {
-      const response = await axios.delete(
+      const response = await api.delete(
         `/attendee/removeAttendee/${attendeeId}`
       );
       console.log("attendee removal response:", response);

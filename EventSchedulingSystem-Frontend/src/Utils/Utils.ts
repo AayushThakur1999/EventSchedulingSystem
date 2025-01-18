@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../Config/axios.config";
 import { NavigateFunction } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -26,7 +26,7 @@ export const dateOptions: Intl.DateTimeFormatOptions = {
 
 export const logoutUser = async (navigate: NavigateFunction) => {
   try {
-    const response = await axios.post("/users/logout", {});
+    const response = await api.post("/users/logout", {});
     console.log(response);
     toast(response.data?.message || "You have Logged-Out Successfully :)");
     navigate("/login");

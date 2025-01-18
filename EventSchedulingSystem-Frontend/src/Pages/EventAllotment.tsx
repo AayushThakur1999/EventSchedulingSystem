@@ -25,10 +25,11 @@ import { Link, useLocation } from "react-router-dom";
 import { TimeObject } from "../Types";
 import { FormInput } from "../Components";
 import { convertTo24HourFormat } from "../Utils";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import { toast } from "react-toastify";
 import { timeSlots } from "../Utils";
 import { debounce } from "lodash";
+import api from "../Config/axios.config";
 
 const EventAllotment = () => {
   const [selectedDate, setSelectedDate] = useState("");
@@ -47,7 +48,7 @@ const EventAllotment = () => {
   const fetchSuggestions = debounce(async (query: string) => {
     if (query.length > 1) {
       try {
-        const response = await axios.get(`/attendee/eventNames?q=${query}`);
+        const response = await api.get(`/attendee/eventNames?q=${query}`);
         console.log("response of titles", response);
         const titles = response.data.data;
         setSuggestions(titles);
@@ -136,7 +137,7 @@ const EventAllotment = () => {
     };
     console.log(userSchedulingData);
     try {
-      const response = await axios.post(
+      const response = await api.post(
         "/attendee/add-attendee",
         userSchedulingData,
         {

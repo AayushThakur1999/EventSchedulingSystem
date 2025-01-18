@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -15,6 +15,7 @@ import {
 import { toast } from "react-toastify";
 import { Navbar } from "../Components";
 import { dateOptions, logoutUser } from "../Utils";
+import api from "../Config/axios.config";
 
 const UserAvailability = () => {
   const { userData, userAvailabilities } = useLoaderData() as userLoaderData;
@@ -46,7 +47,7 @@ const UserAvailability = () => {
     //   availability.startDateAndTime < availability.endDateAndTime
     // );
     try {
-      const response = await axios.post(
+      const response = await api.post(
         "/availability/add-availability",
         availability,
         {
@@ -93,7 +94,7 @@ const UserAvailability = () => {
     console.log("docID", docID);
 
     try {
-      const response = await axios.delete(
+      const response = await api.delete(
         `/availability/deleteAvailability/${docID}`
       );
       console.log(response);
@@ -147,7 +148,7 @@ const UserAvailability = () => {
 
   // Check if navigation is in progress
   const isLoading = navigation.state === "loading";
-  
+
   return (
     <div className="max-w-5xl mx-auto py-8 grid grid-cols-1 gap-6">
       <Navbar

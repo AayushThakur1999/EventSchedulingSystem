@@ -4,7 +4,7 @@ import FormInput from "./FormInput";
 import { Form, useNavigate } from "react-router-dom";
 import SubmitBtn from "./SubmitBtn";
 import { toast } from "react-toastify";
-import axios from "axios";
+import api from "../Config/axios.config";
 
 const Navbar = ({
   name,
@@ -30,7 +30,7 @@ const Navbar = ({
     const formData = new FormData(e.currentTarget);
     const userDetails = Object.fromEntries(formData);
     try {
-      const response = await axios.patch("/users/update-details", userDetails, {
+      const response = await api.patch("/users/update-details", userDetails, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -62,7 +62,7 @@ const Navbar = ({
       return toast.error("Your new password entries are different!");
     }
     try {
-      await axios.patch(
+      await api.patch(
         "/users/change-password",
         { currentPassword, newPassword },
         {
