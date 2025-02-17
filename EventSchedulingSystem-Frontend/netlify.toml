@@ -21,6 +21,16 @@
   status = 200
   force = true
 
+# Added this redirect because I used axios instead of api (default export of axios.config.ts) to make request 
+# to the api endpoints (attendee endpoints) on my server. I could have added /api/v1 in front of my endpoints 
+# on my frontend too but then that would have required me to also make changes in my vite.config.ts so that this 
+# code works in development mode too. So instead of making changes at 2 places I just made changes here.
+[[redirects]]
+  from = "/attendee/*"
+  to = "https://eventschedulingsystem.onrender.com/api/v1/attendee/:splat"
+  status = 200
+  force = true
+
 [[headers]]
   for = "/*"
     [headers.values]
