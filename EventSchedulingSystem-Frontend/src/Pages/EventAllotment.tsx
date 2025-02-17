@@ -19,17 +19,39 @@
 // };
 // export default UserScheduling;
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Calendar, Clock } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { TimeObject } from "../Types";
 import { FormInput } from "../Components";
 import { convertTo24HourFormat } from "../Utils";
-import { AxiosError } from "axios";
+import axios, { AxiosError } from "axios";
 import { toast } from "react-toastify";
 import { timeSlots } from "../Utils";
 import { debounce } from "lodash";
-import api from "../Config/axios.config";
+
+/* 
+ Debounced function to fetch eventname suggestions from the server. 
+ Created the debounced function outside of the component to prevent recreation on every render 
+ */
+const fetchSuggestions = debounce(
+  async (
+    query: string,
+    callback: (data: Array<{ eventName: string }>) => void
+  ) => {
+    if (query.length > 1) {
+      try {
+        const response = await axios.get(`/attendee/eventNames?q=${query}`);
+        console.log("response of titles", response);
+        callback(response.data.data);
+      } catch (error) {
+        console.error("Error fetching suggestions:", error);
+        callback([]);
+      }
+    }
+  },
+  500
+);
 
 const EventAllotment = () => {
   const [selectedDate, setSelectedDate] = useState("");
@@ -40,23 +62,9 @@ const EventAllotment = () => {
   const [eventName, setEventName] = useState("");
   const [multipleAttendees, setMultipleAttendees] = useState(false);
   /************************************************************** */
-  const [suggestions, setSuggestions] = useState<
-    Array<{ _id: string; eventName: string }>
-  >([]);
-
-  // Debounced function to fetch suggestions from the server
-  const fetchSuggestions = debounce(async (query: string) => {
-    if (query.length > 1) {
-      try {
-        const response = await api.get(`/attendee/eventNames?q=${query}`);
-        console.log("response of titles", response);
-        const titles = response.data.data;
-        setSuggestions(titles);
-      } catch (error) {
-        console.error("Error fetching suggestions:", error);
-      }
-    }
-  }, 300);
+  const [suggestions, setSuggestions] = useState<Array<{ eventName: string }>>(
+    []
+  );
 
   // Handle input change and trigger suggestions fetch
   const handleEventNameChange = (value: string) => {
@@ -64,8 +72,35 @@ const EventAllotment = () => {
     console.log("Value of meeting: ", value);
 
     setEventName(value);
-    fetchSuggestions(value);
+
+    // Call the debounced function with the value and a callback
+    fetchSuggestions(value, (data) => {
+      setSuggestions(data);
+    });
   };
+
+  /* 
+  Clean up the debounced function when component unmounts.
+  Think of debouncing like a timer system. When you type, instead of doing something immediately, 
+  it sets a timer to do that thing later. If you type again before the timer finishes, it resets the timer. 
+  This helps prevent too many actions from happening at once. In our code, every time someone types in the 
+  input field, we're setting up one of these timers through the debounced function. Here's what can happen 
+  without cleanup:
+    1. User types "a" - A timer starts (waiting 500ms)
+    2 .User types "ab" - First timer is reset, new timer starts
+    3. User quickly navigates away from the page
+    4. 500ms passes, and those timers try to run their callbacks
+
+  The problem is that these timers continue to exist even after the user has left the page or the component 
+  has unmounted. When they finally execute, they'll try to update state (through setSuggestions) on a component 
+  that no longer exists. This can cause memory leaks and the dreaded "Can't perform a React state update on 
+  an unmounted component" warning. 
+  */
+  useEffect(() => {
+    return () => {
+      fetchSuggestions.cancel();
+    };
+  }, []);
 
   const { state } = useLocation();
   console.log(state);
@@ -116,6 +151,8 @@ const EventAllotment = () => {
     setMeetingEndTime(time);
   };
 
+  const [isScheduling, setIsScheduling] = useState(false);
+
   const handleSchedule = async () => {
     // if (selectedDate && meetingStartTime && meetingEndTime && eventName) {
     //   alert(
@@ -125,9 +162,9 @@ const EventAllotment = () => {
     // }
 
     // send this data to DB
-
+    setIsScheduling(true);
     const userSchedulingData = {
-      username: username,
+      username: username, // alternatively, you can just write username instead of username: username (es6 feature)
       schedule: {
         meetingStartTime: new Date(`${selectedDate} ${meetingStartTime}`),
         meetingEndTime: new Date(`${selectedDate} ${meetingEndTime}`),
@@ -137,7 +174,7 @@ const EventAllotment = () => {
     };
     console.log(userSchedulingData);
     try {
-      const response = await api.post(
+      const response = await axios.post(
         "/attendee/add-attendee",
         userSchedulingData,
         {
@@ -163,6 +200,8 @@ const EventAllotment = () => {
       }
       toast.error("Some error while trying to add attendee :(");
       throw new Error("Some error while trying to add attendee :(");
+    } finally {
+      setIsScheduling(false);
     }
   };
 
@@ -284,7 +323,7 @@ const EventAllotment = () => {
             <div className="absolute z-10 bg-base-200 border border-base-300 rounded-md mt-1 shadow-lg">
               {suggestions.map((suggestion) => (
                 <div
-                  key={suggestion._id}
+                  key={suggestion.eventName}
                   onClick={() => {
                     setEventName(suggestion.eventName);
                     setSuggestions([]);
@@ -314,10 +353,14 @@ const EventAllotment = () => {
           onClick={handleSchedule}
           className="btn btn-outline hover:!text-white btn-primary"
           disabled={
-            !selectedDate || !meetingStartTime || !meetingEndTime || !eventName
+            !selectedDate ||
+            !meetingStartTime ||
+            !meetingEndTime ||
+            !eventName ||
+            isScheduling
           }
         >
-          Schedule Meeting
+          {isScheduling ? "Scheduling..." : "Schedule Meeting"}
         </button>
       </div>
     </div>
